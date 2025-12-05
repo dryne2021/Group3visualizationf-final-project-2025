@@ -1,0 +1,1271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Market Analytics | 2013-2018 Historical Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== CSS Variables ===== */
+        :root {
+            --primary-color: #3a6ff8;
+            --secondary-color: #10b981;
+            --dark-color: #0f172a;
+            --light-color: #f8fafc;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --header-bg: rgba(15, 23, 42, 0.9);
+            --hover-color: #2563eb;
+            --shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+            --viz-1: #3a6ff8;
+            --viz-2: #10b981;
+            --viz-3: #f59e0b;
+            --viz-4: #8b5cf6;
+            --viz-5: #ef4444;
+            --viz-6: #ec4899;
+            --viz-7: #06b6d4;
+            --viz-8: #84cc16;
+            --viz-9: #f97316;
+            --viz-10: #8b5cf6;
+        }
+
+        /* ===== Reset & Base Styles ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--light-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        /* Background overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('images/crypto-background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.15;
+            z-index: -1;
+        }
+
+        /* ===== Header ===== */
+        .main-header {
+            background: var(--header-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 3rem 2rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                var(--viz-1), var(--viz-2), var(--viz-3), var(--viz-4), 
+                var(--viz-5), var(--viz-6), var(--viz-7), var(--viz-8),
+                var(--viz-9), var(--viz-10));
+        }
+
+        .main-header h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, 
+                var(--viz-1), var(--viz-2), var(--viz-3), var(--viz-4), 
+                var(--viz-5), var(--viz-6), var(--viz-7), var(--viz-8),
+                var(--viz-9), var(--viz-10));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+        }
+
+        .main-header .subtitle {
+            font-size: 1.3rem;
+            color: #cbd5e1;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* ===== Dashboard Stats ===== */
+        .dashboard-stats {
+            max-width: 1400px;
+            margin: 0 auto 3rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 1.8rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 41, 59, 0.95);
+            border-color: var(--primary-color);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .stat-1 .stat-icon {
+            background: linear-gradient(135deg, var(--viz-1), #5b8cff);
+        }
+        .stat-2 .stat-icon {
+            background: linear-gradient(135deg, var(--viz-2), #34d399);
+        }
+        .stat-3 .stat-icon {
+            background: linear-gradient(135deg, var(--viz-3), #fbbf24);
+        }
+        .stat-4 .stat-icon {
+            background: linear-gradient(135deg, var(--viz-4), #a78bfa);
+        }
+        .stat-5 .stat-icon {
+            background: linear-gradient(135deg, var(--viz-5), #f87171);
+        }
+        .stat-6 .stat-icon {
+            background: linear-gradient(135deg, var(--viz-6), #f472b6);
+        }
+
+        .stat-content h3 {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-description {
+            font-size: 0.9rem;
+            color: #94a3b8;
+        }
+
+        /* ===== Visualization Grid ===== */
+        .viz-grid {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+        }
+
+        .viz-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .viz-card:hover {
+            transform: translateY(-8px);
+            background: rgba(30, 41, 59, 0.95);
+            border-color: var(--primary-color);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .viz-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .viz-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        /* Assign different colors for 10 visualizations */
+        .viz-card:nth-child(1) .viz-icon { background: linear-gradient(135deg, var(--viz-1), #5b8cff); }
+        .viz-card:nth-child(2) .viz-icon { background: linear-gradient(135deg, var(--viz-2), #34d399); }
+        .viz-card:nth-child(3) .viz-icon { background: linear-gradient(135deg, var(--viz-3), #fbbf24); }
+        .viz-card:nth-child(4) .viz-icon { background: linear-gradient(135deg, var(--viz-4), #a78bfa); }
+        .viz-card:nth-child(5) .viz-icon { background: linear-gradient(135deg, var(--viz-5), #f87171); }
+        .viz-card:nth-child(6) .viz-icon { background: linear-gradient(135deg, var(--viz-6), #f472b6); }
+        .viz-card:nth-child(7) .viz-icon { background: linear-gradient(135deg, var(--viz-7), #22d3ee); }
+        .viz-card:nth-child(8) .viz-icon { background: linear-gradient(135deg, var(--viz-8), #a3e635); }
+        .viz-card:nth-child(9) .viz-icon { background: linear-gradient(135deg, var(--viz-9), #fb923c); }
+        .viz-card:nth-child(10) .viz-icon { background: linear-gradient(135deg, var(--viz-10), #a78bfa); }
+
+        .viz-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #f1f5f9;
+            flex: 1;
+        }
+
+        .viz-description {
+            color: #cbd5e1;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+            flex: 1;
+        }
+
+        .viz-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .metric-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.8rem;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 6px;
+            border-left: 3px solid;
+        }
+
+        /* Border colors for all 10 visualizations */
+        .viz-card:nth-child(1) .metric-item { border-left-color: var(--viz-1); }
+        .viz-card:nth-child(2) .metric-item { border-left-color: var(--viz-2); }
+        .viz-card:nth-child(3) .metric-item { border-left-color: var(--viz-3); }
+        .viz-card:nth-child(4) .metric-item { border-left-color: var(--viz-4); }
+        .viz-card:nth-child(5) .metric-item { border-left-color: var(--viz-5); }
+        .viz-card:nth-child(6) .metric-item { border-left-color: var(--viz-6); }
+        .viz-card:nth-child(7) .metric-item { border-left-color: var(--viz-7); }
+        .viz-card:nth-child(8) .metric-item { border-left-color: var(--viz-8); }
+        .viz-card:nth-child(9) .metric-item { border-left-color: var(--viz-9); }
+        .viz-card:nth-child(10) .metric-item { border-left-color: var(--viz-10); }
+
+        .metric-label {
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+
+        .metric-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #f1f5f9;
+        }
+
+        .viz-actions {
+            margin-top: auto;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .viz-btn {
+            flex: 1;
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .viz-btn:hover {
+            background: rgba(59, 130, 246, 0.4);
+            transform: translateY(-2px);
+        }
+
+        .viz-btn.primary {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .viz-btn.primary:hover {
+            background: var(--hover-color);
+            border-color: var(--hover-color);
+        }
+
+        /* ===== Insights Panel ===== */
+        .insights-panel {
+            max-width: 1400px;
+            margin: 3rem auto;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .insights-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .insights-header h2 {
+            font-size: 1.8rem;
+            color: #f1f5f9;
+        }
+
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .insight-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            transition: var(--transition);
+            border-top: 4px solid;
+        }
+
+        .insight-card:nth-child(1) {
+            border-top-color: var(--viz-1);
+        }
+        .insight-card:nth-child(2) {
+            border-top-color: var(--viz-2);
+        }
+        .insight-card:nth-child(3) {
+            border-top-color: var(--viz-3);
+        }
+        .insight-card:nth-child(4) {
+            border-top-color: var(--viz-4);
+        }
+
+        .insight-card:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .insight-icon {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--viz-1);
+        }
+
+        .insight-card:nth-child(2) .insight-icon {
+            color: var(--viz-2);
+        }
+        .insight-card:nth-child(3) .insight-icon {
+            color: var(--viz-3);
+        }
+        .insight-card:nth-child(4) .insight-icon {
+            color: var(--viz-4);
+        }
+
+        .insight-card h3 {
+            color: #f1f5f9;
+            margin-bottom: 0.8rem;
+            font-size: 1.2rem;
+        }
+
+        .insight-card p {
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        /* ===== Methodology Section ===== */
+        .methodology-section {
+            max-width: 1400px;
+            margin: 3rem auto;
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .methodology-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .methodology-header h2 {
+            font-size: 2rem;
+            color: #f1f5f9;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--secondary-color), var(--primary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .methodology-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .step-card {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: var(--radius);
+            position: relative;
+        }
+
+        .step-number {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: white;
+            font-size: 1.2rem;
+        }
+
+        .step-icon {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .step-card h3 {
+            color: #f1f5f9;
+            margin-bottom: 0.8rem;
+            font-size: 1.3rem;
+        }
+
+        .step-card p {
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        /* ===== Footer ===== */
+        .main-footer {
+            max-width: 1400px;
+            margin: 3rem auto 0;
+            background: var(--header-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copyright {
+            font-size: 1rem;
+            color: #94a3b8;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .footer-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-color);
+        }
+
+        .tech-stack {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+            justify-content: center;
+        }
+
+        .tech-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.5rem 1rem;
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        /* ===== Responsive Design ===== */
+        @media (max-width: 1200px) {
+            .viz-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 900px) {
+            .viz-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .main-header h1 {
+                font-size: 2.5rem;
+            }
+            
+            .dashboard-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .main-header h1 {
+                font-size: 2rem;
+            }
+            
+            .main-header .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .viz-metrics {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 1.5rem;
+                text-align: center;
+            }
+            
+            .footer-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .tech-stack {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .main-header {
+                padding: 2rem 1.5rem;
+            }
+            
+            .viz-card, .insights-panel, .methodology-section {
+                padding: 1.5rem;
+            }
+            
+            .viz-header {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .viz-actions {
+                flex-direction: column;
+            }
+        }
+
+        /* ===== Animation ===== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-card, .viz-card, .insight-card, .step-card {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <h1><i class="fas fa-chart-network"></i> 2013-2018 Crypto Market Analysis</h1>
+        <p class="subtitle">Historical Analysis Dashboard Featuring 10 Advanced Visualizations of Cryptocurrency Market Evolution During Formative Years</p>
+    </header>
+
+    <!-- Dashboard Stats -->
+    <section class="dashboard-stats">
+        <div class="stat-card stat-1">
+            <div class="stat-icon">
+                <i class="fas fa-chart-bar"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Total Visualizations</h3>
+                <div class="stat-value">10</div>
+                <div class="stat-description">Historical Analysis Dashboards</div>
+            </div>
+        </div>
+        
+        <div class="stat-card stat-2">
+            <div class="stat-icon">
+                <i class="fas fa-calendar-alt"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Analysis Period</h3>
+                <div class="stat-value">2013-2018</div>
+                <div class="stat-description">Formative Crypto Years</div>
+            </div>
+        </div>
+        
+        <div class="stat-card stat-3">
+            <div class="stat-icon">
+                <i class="fas fa-coins"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Cryptocurrencies</h3>
+                <div class="stat-value">50+</div>
+                <div class="stat-description">Early Market Assets</div>
+            </div>
+        </div>
+        
+        <div class="stat-card stat-4">
+            <div class="stat-icon">
+                <i class="fas fa-database"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Data Points</h3>
+                <div class="stat-value">5,000+</div>
+                <div class="stat-description">Historical Metrics Analyzed</div>
+            </div>
+        </div>
+        
+        <div class="stat-card stat-5">
+            <div class="stat-icon">
+                <i class="fas fa-rocket"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Market Growth</h3>
+                <div class="stat-value">15,000%</div>
+                <div class="stat-description">2013-2018 Expansion</div>
+            </div>
+        </div>
+        
+        <div class="stat-card stat-6">
+            <div class="stat-icon">
+                <i class="fas fa-history"></i>
+            </div>
+            <div class="stat-content">
+                <h3>Major Events</h3>
+                <div class="stat-value">8+</div>
+                <div class="stat-description">Significant Market Milestones</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Visualization Grid -->
+    <section class="viz-grid">
+        <!-- Market Volume Analysis -->
+        <div class="viz-card">
+            <div class="viz-header">
+                <div class="viz-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <h3 class="viz-title">Market Volume Analysis 2013-2018</h3>
+            </div>
+            <p class="viz-description">
+                Tracks cryptocurrency trading volume evolution from Bitcoin's early adoption through the 2017 bull run. Reveals growth patterns during market maturation.
+            </p>
+            <div class="viz-metrics">
+                <div class="metric-item">
+                    <span class="metric-label">Time Period</span>
+                    <span class="metric-value">2013-2018</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Peak Volume</span>
+                    <span class="metric-value">$25B (2017)</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Growth Rate</span>
+                    <span class="metric-value">+850% YoY</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">BTC Dominance</span>
+                    <span class="metric-value">85% → 38%</span>
+                </div>
+            </div>
+            <div class="viz-actions">
+                <a href="Market Volume Analysis.html" class="viz-btn primary">
+                    <i class="fas fa-external-link-alt"></i> Explore Visualization
+                </a>
+                <button class="viz-btn" onclick="showDetails('volume')">
+                    <i class="fas fa-info-circle"></i> Details
+                </button>
+            </div>
+        </div>
+
+        <!-- Market Capitalization Treemap -->
+        <div class="viz-card">
+            <div class="viz-header">
+                <div class="viz-icon">
+                    <i class="fas fa-sitemap"></i>
+                </div>
+                <h3 class="viz-title">Market Cap Treemap 2013-2018</h3>
+            </div>
+            <p class="viz-description">
+                Shows market structure evolution from Bitcoin dominance to the emergence of Ethereum and early altcoins. Visualizes the 2017 altcoin season.
+            </p>
+            <div class="viz-metrics">
+                <div class="metric-item">
+                    <span class="metric-label">Start Market Cap</span>
+                    <span class="metric-value">$1.5B (2013)</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Peak Market Cap</span>
+                    <span class="metric-value">$820B (2018)</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">BTC Dominance</span>
+                    <span class="metric-value">95% → 52%</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Top Altcoins</span>
+                    <span class="metric-value">ETH, XRP, LTC</span>
+                </div>
+            </div>
+            <div class="viz-actions">
+                <a href="Market Capitalization Treemap.html" class="viz-btn primary">
+                    <i class="fas fa-external-link-alt"></i> Explore Visualization
+                </a>
+                <button class="viz-btn" onclick="showDetails('treemap')">
+                    <i class="fas fa-info-circle"></i> Details
+                </button>
+            </div>
+        </div>
+
+        <!-- Close Ratio Analysis -->
+        <div class="viz-card">
+            <div class="viz-header">
+                <div class="viz-icon">
+                    <i class="fas fa-fire"></i>
+                </div>
+                <h3 class="viz-title">Close Ratio Analysis 2013-2018</h3>
+            </div>
+            <p class="viz-description">
+                Heatmap analysis of early cryptocurrency volatility. Shows the 2014 bear market recovery and 2017 parabolic moves.
+            </p>
+            <div class="viz-metrics">
+                <div class="metric-item">
+                    <span class="metric-label">Assets Analyzed</span>
+                    <span class="metric-value">15+</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Time Period</span>
+                    <span class="metric-value">2013-2018</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Volatility Peak</span>
+                    <span class="metric-value">Dec 2017</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Ratio Range</span>
+                    <span class="metric-value">0.5-1.8</span>
+                </div>
+            </div>
+            <div class="viz-actions">
+                <a href="Cryptocurrency Close Ratio Analysis.html" class="viz-btn primary">
+                    <i class="fas fa-external-link-alt"></i> Explore Visualization
+                </a>
+                <button class="viz-btn" onclick="showDetails('close-ratio')">
+                    <i class="fas fa-info-circle"></i> Details
+                </button>
+            </div>
+        </div>
+
+        <!-- Calculation Overview -->
+        <div class="viz-card">
+            <div class="viz-header">
+                <div class="viz-icon">
+                    <i class="fas fa-calculator"></i>
+                </div>
+                <h3 class="viz-title">Calculation Overview 2013-2018</h3>
+            </div>
+            <p class="viz-description">
+                Analytical framework for evaluating early digital assets. Includes metrics adjusted for the high-volatility period.
+            </p>
+            <div class="viz-metrics">
+                <div class="metric-item">
+                    <span class="metric-label">Metrics Calculated</span>
+                    <span class="metric-value">10+</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Time Period</span>
+                    <span class="metric-value">2013-2018</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Avg. Volatility</span>
+                    <span class="metric-value">85%</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Top Performer</span>
+                    <span class="metric-value">ETH (+28,000%)</span>
+                </div>
+            </div>
+            <div class="viz-actions">
+                <a href="Cryptocurrency Calculation Overview.html" class="viz-btn primary">
+                    <i class="fas fa-external-link-alt"></i> Explore Visualization
+                </a>
+                <button class="viz-btn" onclick="showDetails('calculation')">
+                    <i class="fas fa-info-circle"></i> Details
+                </button>
+            </div>
+        </div>
+
+        <!-- Market vs Volume Analysis -->
+        <div class="viz-card">
+            <div class="viz-header">
+                <div class="viz-icon">
+                    <i class="fas fa-chart-scatter"></i>
+                </div>
+                <h3 class="viz-title">Market vs Volume Analysis 2013-2018</h3>
+            </div>
+            <p class="viz-description">
+                Scatter plot comparing early market cap with trading volume. Shows liquidity development during market expansion.
+            </p>
+            <div class="viz-metrics">
+                <div class="metric-item">
+                    <span class="metric-label">Correlation</span>
+                    <span class="metric-value">0.72</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Assets Analyzed</span>
+                    <span class="metric-value">50+</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Liquidity Growth</span>
+                    <span class="metric-value">600% YoY</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Market Stages</span>
+                    <span class="metric-value">3</span>
+                </div>
+            </div>
+            <div class="viz-actions">
+                <a href="Market vs Volume Analysis.html" class="viz-btn primary">
+                    <i class="fas fa-external-link-alt"></i> Explore Visualization
+                </a>
+                <button class="viz-btn" onclick="showDetails('market-volume')">
+                    <i class="fas fa-info-circle"></i> Details
+                </button>
+            </div>
+        </div>
+
+        <!-- Volume Over Time -->
+        <div class="viz-card">
+            <div class="viz-header">
+                <div class="viz-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h3 class="viz-title">Volume Over Time 2013-2018</h3>
+            </div>
+            <p class="viz-description">
+                Historical tracking of cryptocurrency volume from Mt. Gox era through early exchange development and 2017 boom.
+            </p>
+            <div class="viz-metrics">
+                <div class="metric-item">
+                    <span class="metric-label">Cryptocurrencies</span>
+                    <span class="metric-value">12+</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Time Period</span>
+                    <span class="metric-value">2013-2018</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Volume Growth</span>
+                    <span class="metric-value">10,000x</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Key Events</span>
+                    <span class="metric-value">Mt. Gox, ETH Launch</span>
+                </div>
+            </div>
+            <div class="viz-actions">
+                <a href="Cryptocurrency Volume Over Time.html" class="viz-btn primary">
+                    <i class="fas fa-external-link-alt"></i> Explore Visualization
+                </a>
+                <button class="viz-btn" onclick="showDetails('volume-time')">
+                    <i class="fas fa-info-circle"></i> Details
+                </button>
+            </div>
+        </div>
+
+        <!-- Price Correlation Matrix -->
+        <div class="viz-card">
+            <div class="viz-header">
+                <div class="viz-icon">
+                    <i class="fas fa-project-diagram"></i>
+                </div>
+                <h3 class="viz-title">Price Correlation Matrix 2013-2018</h3>
+            </div>
+            <p class="viz-description">
+                Matrix showing price correlation between early cryptocurrencies. Reveals increasing market decoupling and sector development.
+            </p>
+            <div class="viz-metrics">
+                <div class="metric-item">
+                    <span class="metric-label">Assets Compared</span>
+                    <span class="metric-value">20</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Avg. Correlation</span>
+                    <span class="metric-value">0.65 → 0.45</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Time Period</span>
+                    <span class="metric-value">2013-2018</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Sector Clusters</span>
+                    <span class="metric-value">4</span>
+                </div>
+            </div>
+            <div class="viz-actions">
+                <a href="Price_Correlation_Matrix.html" class="viz-btn primary">
+                    <i class="fas fa-external-link-alt"></i> Explore Visualization
+                </a>
+                <button class="viz-btn" onclick="showDetails('correlation')">
+                    <i class="fas fa-info-circle"></i> Details
+                </button>
+            </div>
+        </div>
+
+        <!-- Volatility Timeline -->
+        <div class="viz-card">
+            <div class="viz-header">
+                <div class="viz-icon">
+                    <i class="fas fa-wave-square"></i>
+                </div>
+                <h3 class="viz-title">Volatility Timeline 2013-2018</h3>
+            </div>
+            <p class="viz-description">
+                Timeline visualization of market volatility spikes and calm periods during crypto's formative years.
+            </p>
+            <div class="viz-metrics">
+                <div class="metric-item">
+                    <span class="metric-label">Volatility Events</span>
+                    <span class="metric-value">15+</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Time Period</span>
+                    <span class="metric-value">2013-2018</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Max Volatility</span>
+                    <span class="metric-value">Dec 2013/2017</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Stable Periods</span>
+                    <span class="metric-value">2015-2016</span>
+                </div>
+            </div>
+            <div class="viz-actions">
+                <a href="Volatility_Timeline.html" class="viz-btn primary">
+                    <i class="fas fa-external-link-alt"></i> Explore Visualization
+                </a>
+                <button class="viz-btn" onclick="showDetails('volatility')">
+                    <i class="fas fa-info-circle"></i> Details
+                </button>
+            </div>
+        </div>
+
+        <!-- Exchange Dominance -->
+        <div class="viz-card">
+            <div class="viz-header">
+                <div class="viz-icon">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <h3 class="viz-title">Exchange Dominance 2013-2018</h3>
+            </div>
+            <p class="viz-description">
+                Analysis of trading volume distribution across exchanges from Mt. Gox dominance to modern exchange ecosystem.
+            </p>
+            <div class="viz-metrics">
+                <div class="metric-item">
+                    <span class="metric-label">Exchanges Tracked</span>
+                    <span class="metric-value">25+</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Time Period</span>
+                    <span class="metric-value">2013-2018</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Mt. Gox Peak</span>
+                    <span class="metric-value">70% (2013)</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Binance Rise</span>
+                    <span class="metric-value">2017-2018</span>
+                </div>
+            </div>
+            <div class="viz-actions">
+                <a href="Exchange_Dominance.html" class="viz-btn primary">
+                    <i class="fas fa-external-link-alt"></i> Explore Visualization
+                </a>
+                <button class="viz-btn" onclick="showDetails('exchange')">
+                    <i class="fas fa-info-circle"></i> Details
+                </button>
+            </div>
+        </div>
+
+        <!-- Market Cycle Analysis -->
+        <div class="viz-card">
+            <div class="viz-header">
+                <div class="viz-icon">
+                    <i class="fas fa-sync-alt"></i>
+                </div>
+                <h3 class="viz-title">Market Cycle Analysis 2013-2018</h3>
+            </div>
+            <p class="viz-description">
+                Identification and analysis of complete market cycles during crypto's early development phase.
+            </p>
+            <div class="viz-metrics">
+                <div class="metric-item">
+                    <span class="metric-label">Full Cycles</span>
+                    <span class="metric-value">2.5</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Time Period</span>
+                    <span class="metric-value">2013-2018</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Cycle Duration</span>
+                    <span class="metric-value">24-30 months</span>
+                </div>
+                <div class="metric-item">
+                    <span class="metric-label">Peak Returns</span>
+                    <span class="metric-value">20,000% (2017)</span>
+                </div>
+            </div>
+            <div class="viz-actions">
+                <a href="Market_Cycle_Analysis.html" class="viz-btn primary">
+                    <i class="fas fa-external-link-alt"></i> Explore Visualization
+                </a>
+                <button class="viz-btn" onclick="showDetails('cycle')">
+                    <i class="fas fa-info-circle"></i> Details
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Insights Panel -->
+    <section class="insights-panel">
+        <div class="insights-header">
+            <i class="fas fa-chart-line" style="font-size: 2rem; color: var(--secondary-color);"></i>
+            <h2>2013-2018 Market Insights</h2>
+        </div>
+        <div class="insights-grid">
+            <div class="insight-card">
+                <div class="insight-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <h3>Exponential Early Growth</h3>
+                <p>Total market cap grew from $1.5B to $820B (54,667% increase). Bitcoin dominance decreased from 95% to 52% as altcoins emerged.</p>
+            </div>
+            
+            <div class="insight-card">
+                <div class="insight-icon">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h3>Market Structure Evolution</h3>
+                <p>Transition from Bitcoin monopoly to diversified ecosystem with Ethereum smart contracts and specialized altcoins.</p>
+            </div>
+            
+            <div class="insight-card">
+                <div class="insight-icon">
+                    <i class="fas fa-chart-pie"></i>
+                </div>
+                <h3>Liquidity Transformation</h3>
+                <p>Trading volume increased 10,000x with exchange diversification from Mt. Gox (70% share) to modern exchange ecosystem.</p>
+            </div>
+            
+            <div class="insight-card">
+                <div class="insight-icon">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <h3>Complete Market Cycles</h3>
+                <p>Analysis reveals 2.5 complete market cycles with distinct accumulation, markup, distribution, and markdown phases.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Methodology Section -->
+    <section class="methodology-section">
+        <div class="methodology-header">
+            <h2><i class="fas fa-cogs"></i> Historical Analysis Methodology</h2>
+            <p style="color: #cbd5e1; max-width: 800px; margin: 0 auto;">Specialized approach for analyzing cryptocurrency's formative years 2013-2018</p>
+        </div>
+        <div class="methodology-steps">
+            <div class="step-card">
+                <div class="step-number">1</div>
+                <div class="step-icon">
+                    <i class="fas fa-archive"></i>
+                </div>
+                <h3>Historical Data Recovery</h3>
+                <p>Aggregating data from early exchanges, blockchain archives, and historical price feeds from 2013-2018</p>
+            </div>
+            
+            <div class="step-card">
+                <div class="step-number">2</div>
+                <div class="step-icon">
+                    <i class="fas fa-filter"></i>
+                </div>
+                <h3>Data Normalization</h3>
+                <p>Adjusting for exchange closures, data gaps, and varying reporting standards across the early crypto era</p>
+            </div>
+            
+            <div class="step-card">
+                <div class="step-number">3</div>
+                <div class="step-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3>Cycle Analysis</h3>
+                <p>Identifying and analyzing complete market cycles during crypto's formative development phase</p>
+            </div>
+            
+            <div class="step-card">
+                <div class="step-number">4</div>
+                <div class="step-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3>Pattern Recognition</h3>
+                <p>Detecting recurring patterns, correlations, and structural changes in early cryptocurrency markets</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div>
+                <p class="copyright">© 2025 Historical Crypto Market Analysis 2013-2018</p>
+                <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 0.5rem;">Comprehensive Analysis of Cryptocurrency's Formative Years</p>
+            </div>
+            <div class="footer-links">
+                <a href="#"><i class="fas fa-file-alt"></i> Historical Data</a>
+                <a href="#"><i class="fas fa-code"></i> Analysis Methods</a>
+                <a href="#"><i class="fas fa-envelope"></i> Research Contact</a>
+            </div>
+        </div>
+        <div class="tech-stack">
+            <div class="tech-item">
+                <i class="fas fa-archive"></i>
+                <span>Historical Data</span>
+            </div>
+            <div class="tech-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Time Series Analysis</span>
+            </div>
+            <div class="tech-item">
+                <i class="fas fa-exchange-alt"></i>
+                <span>Exchange Data</span>
+            </div>
+            <div class="tech-item">
+                <i class="fas fa-chart-bar"></i>
+                <span>Tableau Visualizations</span>
+            </div>
+            <div class="tech-item">
+                <i class="fas fa-history"></i>
+                <span>2013-2018 Focus</span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function showDetails(vizType) {
+            const messages = {
+                'volume': 'Market Volume Analysis: Shows trading volume evolution from Bitcoin\'s early days through the 2017 bull market.',
+                'treemap': 'Market Cap Treemap: Visualizes market structure changes as altcoins gained market share.',
+                'close-ratio': 'Close Ratio Analysis: Heatmap showing volatility patterns during key market events.',
+                'calculation': 'Calculation Overview: Analytical framework for evaluating early digital assets.',
+                'market-volume': 'Market vs Volume: Scatter plot showing liquidity development during market expansion.',
+                'volume-time': 'Volume Over Time: Historical tracking from Mt. Gox era to modern exchanges.',
+                'correlation': 'Price Correlation: Matrix showing how assets moved together during early years.',
+                'volatility': 'Volatility Timeline: Shows major volatility events and calm periods.',
+                'exchange': 'Exchange Dominance: Tracks trading volume migration across exchanges.',
+                'cycle': 'Market Cycle Analysis: Identifies complete cycles during formative years.'
+            };
+            
+            alert(messages[vizType] || 'Detailed analysis of cryptocurrency market patterns 2013-2018.');
+        }
+    </script>
+</body>
+</html>

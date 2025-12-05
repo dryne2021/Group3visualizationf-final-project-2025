@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptocurrency Volume Over Time 2013-2018 | Historical Market Analysis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== CSS Variables ===== */
+        :root {
+            --primary-color: #3a6ff8;
+            --secondary-color: #2ecc71;
+            --dark-color: #0f172a;
+            --light-color: #f8fafc;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --header-bg: rgba(15, 23, 42, 0.9);
+            --hover-color: #2563eb;
+            --shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+            --year-2013: #ef4444;
+            --year-2014: #f59e0b;
+            --year-2015: #10b981;
+            --year-2016: #3b82f6;
+            --year-2017: #8b5cf6;
+            --year-2018: #ec4899;
+        }
+
+        /* ===== Reset & Base Styles ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--light-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Background overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('images/crypto-background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.15;
+            z-index: -1;
+        }
+
+        /* ===== Header ===== */
+        .main-header {
+            background: var(--header-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            max-width: 1200px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                var(--year-2013), 
+                var(--year-2014), 
+                var(--year-2015), 
+                var(--year-2016), 
+                var(--year-2017), 
+                var(--year-2018));
+        }
+
+        .main-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, 
+                var(--year-2013), 
+                var(--year-2014), 
+                var(--year-2015), 
+                var(--year-2016), 
+                var(--year-2017), 
+                var(--year-2018));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+            padding: 0.7rem 1.2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-button:hover {
+            background: rgba(59, 130, 246, 0.4);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        /* ===== Main Content ===== */
+        .content-wrapper {
+            max-width: 1200px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        /* ===== Overview Card ===== */
+        .overview-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+        }
+
+        .overview-text {
+            font-size: 1.1rem;
+            color: #cbd5e1;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .highlight {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .period-badge {
+            display: inline-block;
+            background: linear-gradient(90deg, var(--year-2013), var(--year-2018));
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        /* ===== Year Volume Analysis ===== */
+        .year-analysis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .year-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: var(--radius);
+            padding: 1.2rem;
+            text-align: center;
+            transition: var(--transition);
+            border-top: 3px solid;
+            cursor: pointer;
+        }
+
+        .year-card:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .year-card[data-year="2013"] {
+            border-top-color: var(--year-2013);
+        }
+        .year-card[data-year="2014"] {
+            border-top-color: var(--year-2014);
+        }
+        .year-card[data-year="2015"] {
+            border-top-color: var(--year-2015);
+        }
+        .year-card[data-year="2016"] {
+            border-top-color: var(--year-2016);
+        }
+        .year-card[data-year="2017"] {
+            border-top-color: var(--year-2017);
+        }
+        .year-card[data-year="2018"] {
+            border-top-color: var(--year-2018);
+        }
+
+        .year-label {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #f1f5f9;
+        }
+
+        .year-volume {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .year-card[data-year="2013"] .year-volume { color: var(--year-2013); }
+        .year-card[data-year="2014"] .year-volume { color: var(--year-2014); }
+        .year-card[data-year="2015"] .year-volume { color: var(--year-2015); }
+        .year-card[data-year="2016"] .year-volume { color: var(--year-2016); }
+        .year-card[data-year="2017"] .year-volume { color: var(--year-2017); }
+        .year-card[data-year="2018"] .year-volume { color: var(--year-2018); }
+
+        .year-growth {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        /* ===== Key Metrics ===== */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .metric-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border-left: 4px solid var(--year-2017);
+            transition: var(--transition);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .metric-title {
+            font-size: 1rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .metric-description {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+
+        /* ===== Visualization Container ===== */
+        .viz-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .viz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .viz-title {
+            font-size: 1.5rem;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .viz-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .viz-btn {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .viz-btn:hover {
+            background: rgba(59, 130, 246, 0.4);
+        }
+
+        /* ===== Tableau Visualization ===== */
+        .tableau-wrapper {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* ===== Insights Section ===== */
+        .insights-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .insight-item {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .insight-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .insight-title {
+            font-size: 1.2rem;
+            color: #f1f5f9;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .insight-text {
+            color: #cbd5e1;
+            line-height: 1.7;
+        }
+
+        .insight-year {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-right: 8px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        /* ===== Volume Timeline ===== */
+        .volume-timeline {
+            display: flex;
+            justify-content: space-between;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .volume-timeline::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                var(--year-2013), 
+                var(--year-2014), 
+                var(--year-2015), 
+                var(--year-2016), 
+                var(--year-2017), 
+                var(--year-2018));
+            z-index: 1;
+        }
+
+        .timeline-point {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+
+        .timeline-dot {
+            width: 15px;
+            height: 15px;
+            background: var(--year-2013);
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            border: 3px solid var(--dark-color);
+        }
+
+        .timeline-point:nth-child(1) .timeline-dot { background: var(--year-2013); }
+        .timeline-point:nth-child(2) .timeline-dot { background: var(--year-2014); }
+        .timeline-point:nth-child(3) .timeline-dot { background: var(--year-2015); }
+        .timeline-point:nth-child(4) .timeline-dot { background: var(--year-2016); }
+        .timeline-point:nth-child(5) .timeline-dot { background: var(--year-2017); }
+        .timeline-point:nth-child(6) .timeline-dot { background: var(--year-2018); }
+
+        .timeline-year {
+            color: #f1f5f9;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .timeline-volume {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+
+        /* ===== Footer ===== */
+        .main-footer {
+            margin-top: 3rem;
+            background: var(--header-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 1.8rem;
+            text-align: center;
+            max-width: 1200px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copyright {
+            font-size: 1rem;
+            color: #94a3b8;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-color);
+        }
+
+        /* ===== Responsive Design ===== */
+        @media (max-width: 768px) {
+            .main-header h1 {
+                font-size: 2rem;
+            }
+            
+            .back-button {
+                position: relative;
+                left: 0;
+                top: 0;
+                transform: none;
+                margin-bottom: 1rem;
+                align-self: flex-start;
+            }
+            
+            .main-header {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .year-analysis {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .viz-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .content-wrapper {
+                gap: 1.5rem;
+            }
+            
+            .volume-timeline {
+                flex-wrap: wrap;
+                gap: 1.5rem;
+            }
+            
+            .volume-timeline::before {
+                display: none;
+            }
+            
+            .timeline-point {
+                flex: 0 0 calc(50% - 1rem);
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .overview-card,
+            .viz-container,
+            .insights-card {
+                padding: 1.5rem;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .main-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .year-analysis {
+                grid-template-columns: 1fr;
+            }
+            
+            .timeline-point {
+                flex: 0 0 100%;
+            }
+        }
+
+        /* ===== Animation ===== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .overview-card,
+        .viz-container,
+        .insights-card {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <a href="index.html" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        <h1><i class="fas fa-chart-line"></i> Cryptocurrency Volume Over Time 2013-2018</h1>
+        <p>Historical Trading Volume Analysis During Crypto's Formative Years</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content-wrapper">
+        <!-- Overview Section -->
+        <section class="overview-card">
+            <div class="period-badge">Analysis Period: 2013-2018</div>
+            <h2 class="section-title"><i class="fas fa-info-circle"></i> 2013-2018 Volume Analysis</h2>
+            <p class="overview-text">
+                The <span class="highlight">Cryptocurrency Volume Over Time 2013-2018</span> visualization tracks the explosive growth of trading volume during cryptocurrency's formative years. This analysis shows how volume evolved from early Bitcoin dominance through the 2017 altcoin season and subsequent market correction.
+            </p>
+            
+            <!-- Year Analysis -->
+            <div class="year-analysis">
+                <div class="year-card" data-year="2013" onclick="showYearVolume('2013')">
+                    <div class="year-label">2013</div>
+                    <div class="year-volume">$100M</div>
+                    <div class="year-growth">Early Bitcoin era</div>
+                </div>
+                
+                <div class="year-card" data-year="2014" onclick="showYearVolume('2014')">
+                    <div class="year-label">2014</div>
+                    <div class="year-volume">$200M</div>
+                    <div class="year-growth">Post-Mt. Gox</div>
+                </div>
+                
+                <div class="year-card" data-year="2015" onclick="showYearVolume('2015')">
+                    <div class="year-label">2015</div>
+                    <div class="year-volume">$500M</div>
+                    <div class="year-growth">Ethereum launch</div>
+                </div>
+                
+                <div class="year-card" data-year="2016" onclick="showYearVolume('2016')">
+                    <div class="year-label">2016</div>
+                    <div class="year-volume">$1.2B</div>
+                    <div class="year-growth">Pre-halving</div>
+                </div>
+                
+                <div class="year-card" data-year="2017" onclick="showYearVolume('2017')">
+                    <div class="year-label">2017</div>
+                    <div class="year-volume">$70B</div>
+                    <div class="year-growth">Bull market peak</div>
+                </div>
+                
+                <div class="year-card" data-year="2018" onclick="showYearVolume('2018')">
+                    <div class="year-label">2018</div>
+                    <div class="year-volume">$15B</div>
+                    <div class="year-growth">Post-correction</div>
+                </div>
+            </div>
+            
+            <!-- Volume Timeline -->
+            <div class="volume-timeline">
+                <div class="timeline-point">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-year">2013</div>
+                    <div class="timeline-volume">Mt. Gox era</div>
+                </div>
+                <div class="timeline-point">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-year">2014</div>
+                    <div class="timeline-volume">Post-collapse</div>
+                </div>
+                <div class="timeline-point">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-year">2015</div>
+                    <div class="timeline-volume">Recovery</div>
+                </div>
+                <div class="timeline-point">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-year">2016</div>
+                    <div class="timeline-volume">Growth</div>
+                </div>
+                <div class="timeline-point">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-year">2017</div>
+                    <div class="timeline-volume">Explosion</div>
+                </div>
+                <div class="timeline-point">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-year">2018</div>
+                    <div class="timeline-volume">Correction</div>
+                </div>
+            </div>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-title"><i class="fas fa-calendar-alt"></i> Analysis Period</div>
+                    <div class="metric-value">2013-2018</div>
+                    <div class="metric-description">Complete early market cycle</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-title"><i class="fas fa-coins"></i> Historical Assets</div>
+                    <div class="metric-value">15+</div>
+                    <div class="metric-description">Early cryptocurrencies tracked</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-title"><i class="fas fa-chart-bar"></i> Volume Growth</div>
+                    <div class="metric-value">70,000%</div>
+                    <div class="metric-description">Increase from 2013 to 2018</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-title"><i class="fas fa-ruler"></i> Peak Volume</div>
+                    <div class="metric-value">$70B/day</div>
+                    <div class="metric-description">December 2017 record</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Visualization Section -->
+        <section class="viz-container">
+            <div class="viz-header">
+                <h2 class="viz-title"><i class="fas fa-chart-bar"></i> Historical Volume Analysis Chart</h2>
+                <div class="viz-actions">
+                    <button class="viz-btn" onclick="fullscreenView()">
+                        <i class="fas fa-expand"></i> Fullscreen
+                    </button>
+                    <button class="viz-btn" onclick="downloadImage()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                    <button class="viz-btn" onclick="filterByYear()">
+                        <i class="fas fa-calendar"></i> Filter Year
+                    </button>
+                    <button class="viz-btn" onclick="show2017Volume()">
+                        <i class="fas fa-chart-line"></i> 2017 View
+                    </button>
+                </div>
+            </div>
+            
+            <p style="color: #94a3b8; margin-bottom: 1.5rem;">
+                <i class="fas fa-mouse-pointer"></i> This chart shows cryptocurrency volume evolution from 2013-2018. Use year filters to analyze specific periods like the 2014 bear market or 2017 bull market.
+            </p>
+            
+            <!-- Tableau Visualization -->
+            <div class="tableau-wrapper">
+                <h2>Cryptocurrency Volume Over Time 2013-2018</h2>
+                <p><strong>Historical Analysis:</strong> This visualization tracks the explosive growth of cryptocurrency trading volume during the formative years of 2013-2018. The bar chart shows annual trading volume for major cryptocurrencies, revealing key market phases: the early Bitcoin monopoly (2013), post-Mt. Gox recovery (2014-2015), pre-halving buildup (2016), bull market peak (2017), and market correction (2018).</p>
+
+                <div class='tableauPlaceholder' id='viz1764805713796' style='position: relative'>
+                    <noscript>
+                        <a href='#'>
+                            <img alt=' ' src='https://public.tableau.com/static/images/6_/6_17648056816410/CryptocurrencyVolumeOverTime/1_rss.png' style='border: none' />
+                        </a>
+                    </noscript>
+                    <object class='tableauViz' style='display:none; width: 100%; height: 100%;'>
+                        <param name='host_url' value='https://public.tableau.com/' />
+                        <param name='embed_code_version' value='3' />
+                        <param name='site_root' value='' />
+                        <param name='name' value='6_17648056816410/CryptocurrencyVolumeOverTime' />
+                        <param name='tabs' value='no' />
+                        <param name='toolbar' value='no' />
+                        <param name='static_image' value='https://public.tableau.com/static/images/6_/6_17648056816410/CryptocurrencyVolumeOverTime/1.png' />
+                        <param name='animate_transition' value='yes' />
+                        <param name='display_static_image' value='yes' />
+                        <param name='display_spinner' value='yes' />
+                        <param name='display_overlay' value='yes' />
+                        <param name='display_count' value='yes' />
+                        <param name='language' value='en-US' />
+                    </object>
+                </div>
+
+                <script type='text/javascript'>
+                    var divElement = document.getElementById('viz1764805713796'); 
+                    var vizElement = divElement.getElementsByTagName('object')[0]; 
+                    vizElement.style.width='100%'; 
+                    vizElement.style.height=(divElement.offsetWidth*0.75)+'px'; 
+                    var scriptElement = document.createElement('script'); 
+                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js'; 
+                    vizElement.parentNode.insertBefore(scriptElement, vizElement);
+                    
+                    function fullscreenView() {
+                        const element = document.getElementById('viz1764805713796');
+                        if (element.requestFullscreen) {
+                            element.requestFullscreen();
+                        } else if (element.webkitRequestFullscreen) {
+                            element.webkitRequestFullscreen();
+                        } else if (element.msRequestFullscreen) {
+                            element.msRequestFullscreen();
+                        }
+                    }
+                    
+                    function downloadImage() {
+                        alert('Export functionality would typically connect to Tableau Server API. For this public visualization, use Tableau\'s native export tools.');
+                    }
+                    
+                    function filterByYear() {
+                        alert('Year filter activated. Filter to see volume patterns for specific years (2014 bear market, 2017 bull market, etc.).');
+                    }
+                    
+                    function show2017Volume() {
+                        alert('2017 volume view. Shows the explosive growth during the bull market peak, with many cryptocurrencies showing 10-100x volume increases from 2016.');
+                    }
+                </script>
+            </div>
+            
+            <div style="margin-top: 1.5rem; color: #94a3b8; font-size: 0.9rem;">
+                <p><i class="fas fa-lightbulb"></i> <strong>How to read:</strong> Each bar shows annual trading volume. Higher bars indicate more trading activity. The dramatic growth from 2016 to 2017 shows the bull market impact.</p>
+            </div>
+        </section>
+
+        <!-- Key Insights Section -->
+        <section class="insights-card">
+            <h2 class="section-title"><i class="fas fa-chart-line"></i> 2013-2018 Volume Insights</h2>
+            
+            <div class="insight-item">
+                <h3 class="insight-title"><i class="fas fa-rocket"></i> Volume Growth Patterns</h3>
+                <p class="insight-text">
+                    The visualization reveals exponential volume growth starting in <span class="insight-year" style="background: var(--year-2016);">2016</span>, peaking in <span class="insight-year" style="background: var(--year-2017);">2017</span> with $70B daily volume. Bitcoin dominated early years (<span class="insight-year" style="background: var(--year-2013);">2013</span>-<span class="insight-year" style="background: var(--year-2015);">2015</span>) but altcoins gained significant volume share during the <span class="insight-year" style="background: var(--year-2017);">2017</span> bull market.
+                </p>
+            </div>
+            
+            <div class="insight-item">
+                <h3 class="insight-title"><i class="fas fa-calendar-check"></i> Market Structure Evolution</h3>
+                <p class="insight-text">
+                    Early years (<span class="insight-year" style="background: var(--year-2013);">2013</span>-<span class="insight-year" style="background: var(--year-2014);">2014</span>) showed single-exchange dominance (Mt. Gox). By <span class="insight-year" style="background: var(--year-2017);">2017</span>, multiple global exchanges distributed volume. The <span class="insight-year" style="background: var(--year-2018);">2018</span> correction filtered out low-volume assets.
+                </p>
+            </div>
+            
+            <div class="insight-item">
+                <h3 class="insight-title"><i class="fas fa-exchange-alt"></i> Volume Concentration Trends</h3>
+                <p class="insight-text">
+                    Bitcoin volume concentration decreased from 90%+ (<span class="insight-year" style="background: var(--year-2013);">2013</span>) to 38% (<span class="insight-year" style="background: var(--year-2017);">2017</span>) before recovering to 50%+ (<span class="insight-year" style="background: var(--year-2018);">2018</span>). Ethereum grew from 0% (<span class="insight-year" style="background: var(--year-2014);">2014</span>) to 18% (<span class="insight-year" style="background: var(--year-2017);">2017</span>).
+                </p>
+            </div>
+            
+            <div class="insight-item">
+                <h3 class="insight-title"><i class="fas fa-bolt"></i> Volatility & Volume Correlation</h3>
+                <p class="insight-text">
+                    High volume periods (<span class="insight-year" style="background: var(--year-2017);">2017</span>) correlated with extreme price volatility. Low volume periods (<span class="insight-year" style="background: var(--year-2014);">2014</span>, <span class="insight-year" style="background: var(--year-2018);">2018</span>) showed price consolidation. The <span class="insight-year" style="background: var(--year-2016);">2016</span> halving created sustained volume increase before price surge.
+                </p>
+            </div>
+            
+            <div class="insight-item">
+                <h3 class="insight-title"><i class="fas fa-history"></i> Historical Significance</h3>
+                <p class="insight-text">
+                    The 2013-2018 period represents cryptocurrency's first complete market cycle. Volume patterns established during these years created foundational liquidity structures that enabled later institutional participation and market maturation.
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <p class="copyright">© 2025 Historical Crypto Market Analysis 2013-2018. Volume Analysis Dashboard</p>
+            <div class="footer-links">
+                <a href="#"><i class="fas fa-archive"></i> Historical Data</a>
+                <a href="#"><i class="fas fa-chart-bar"></i> Volume Analysis</a>
+                <a href="index.html"><i class="fas fa-home"></i> Dashboard</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function showYearVolume(year) {
+            const yearDetails = {
+                '2013': '2013: Early Bitcoin market. Average daily volume: $100M. Mt. Gox handles 70% of Bitcoin trades. Few altcoins exist.',
+                '2014': '2014: Post-Mt. Gox collapse. Volume drops 70% initially, recovers to $200M daily. Early altcoins: Litecoin, Ripple.',
+                '2015': '2015: Recovery phase. Volume reaches $500M daily. Ethereum launches (July). First institutional interest emerges.',
+                '2016': '2016: Pre-halving buildup. Volume grows to $1.2B daily. Altcoin volume begins significant growth. Multiple exchanges emerge.',
+                '2017': '2017: Bull market peak. Volume explodes to $70B daily (December). ICO boom creates new trading pairs. Altcoins gain volume share.',
+                '2018': '2018: Post-correction. Volume declines to $15B daily. Market filters out low-volume assets. Institutional infrastructure develops.'
+            };
+            alert(yearDetails[year] || 'Select a year between 2013-2018 to see volume details.');
+        }
+    </script>
+</body>
+</html>

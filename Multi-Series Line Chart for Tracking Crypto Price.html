@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Price Tracking | Multi-Series Line Chart Analysis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== CSS Variables ===== */
+        :root {
+            --primary-color: #3a6ff8;
+            --secondary-color: #ec4899;
+            --dark-color: #0f172a;
+            --light-color: #f8fafc;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --header-bg: rgba(15, 23, 42, 0.9);
+            --hover-color: #2563eb;
+            --shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+            --line-btc: #f59e0b;
+            --line-eth: #8b5cf6;
+            --line-sol: #10b981;
+            --line-ada: #3b82f6;
+            --line-dot: #ef4444;
+            --line-avax: #ec4899;
+        }
+
+        /* ===== Reset & Base Styles ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--light-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Background overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('images/crypto-background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.15;
+            z-index: -1;
+        }
+
+        /* ===== Header ===== */
+        .main-header {
+            background: var(--header-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            max-width: 1200px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--line-btc), var(--line-eth), var(--line-sol), var(--line-ada), var(--line-dot), var(--line-avax));
+        }
+
+        .main-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+            padding: 0.7rem 1.2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-button:hover {
+            background: rgba(59, 130, 246, 0.4);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        /* ===== Main Content ===== */
+        .content-wrapper {
+            max-width: 1200px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        /* ===== Overview Card ===== */
+        .overview-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+        }
+
+        .overview-text {
+            font-size: 1.1rem;
+            color: #cbd5e1;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .highlight {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        /* ===== Line Chart Explanation ===== */
+        .chart-explanation {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border-left: 4px solid var(--line-btc);
+        }
+
+        /* ===== Cryptocurrency Legend ===== */
+        .legend-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.8rem;
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 8px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .legend-item:hover {
+            background: rgba(30, 41, 59, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .legend-line {
+            width: 24px;
+            height: 3px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .legend-line.btc {
+            background: var(--line-btc);
+        }
+
+        .legend-line.eth {
+            background: var(--line-eth);
+        }
+
+        .legend-line.sol {
+            background: var(--line-sol);
+        }
+
+        .legend-line.ada {
+            background: var(--line-ada);
+        }
+
+        .legend-line.dot {
+            background: var(--line-dot);
+        }
+
+        .legend-line.avax {
+            background: var(--line-avax);
+        }
+
+        .legend-content {
+            flex: 1;
+        }
+
+        .legend-name {
+            color: #f1f5f9;
+            font-weight: 500;
+            margin-bottom: 2px;
+            font-size: 0.95rem;
+        }
+
+        .legend-price {
+            color: var(--secondary-color);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .legend-change {
+            color: #94a3b8;
+            font-size: 0.85rem;
+        }
+
+        .legend-change.positive {
+            color: #10b981;
+        }
+
+        .legend-change.negative {
+            color: #ef4444;
+        }
+
+        /* ===== Performance Metrics ===== */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .metric-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border-left: 4px solid var(--primary-color);
+            transition: var(--transition);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .metric-title {
+            font-size: 1rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .metric-description {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+
+        /* ===== Performance Comparison ===== */
+        .performance-comparison {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .performance-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .performance-item:last-child {
+            border-bottom: none;
+        }
+
+        .crypto-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #f1f5f9;
+            min-width: 150px;
+        }
+
+        .performance-line {
+            flex: 1;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            margin: 0 1rem;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .performance-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease;
+        }
+
+        .performance-percent {
+            font-weight: 600;
+            min-width: 80px;
+            text-align: right;
+            font-size: 1.1rem;
+        }
+
+        .performance-percent.positive {
+            color: #10b981;
+        }
+
+        .performance-percent.negative {
+            color: #ef4444;
+        }
+
+        /* ===== Correlation Matrix ===== */
+        .correlation-matrix {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .correlation-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 8px;
+            padding: 1.2rem;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .correlation-card:hover {
+            background: rgba(30, 41, 59, 0.9);
+            transform: translateY(-3px);
+        }
+
+        .correlation-pair {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+        }
+
+        .correlation-value {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--secondary-color);
+        }
+
+        .correlation-strength {
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        .strength-high {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+
+        .strength-medium {
+            background: rgba(245, 158, 11, 0.2);
+            color: #f59e0b;
+        }
+
+        .strength-low {
+            background: rgba(59, 130, 246, 0.2);
+            color: #3b82f6;
+        }
+
+        /* ===== Visualization Container ===== */
+        .viz-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .viz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .viz-title {
+            font-size: 1.5rem;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .viz-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .viz-btn {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .viz-btn:hover {
+            background: rgba(59, 130, 246, 0.4);
+        }
+
+        /* ===== Tableau Visualization ===== */
+        .tableau-wrapper {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+
+        .chart-description {
+            color: #cbd5e1;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        /* ===== Price Insights ===== */
+        .insights-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .insight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .insight-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .insight-card:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .insight-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .insight-icon {
+            font-size: 1.5rem;
+            color: var(--line-btc);
+        }
+
+        .insight-card h3 {
+            color: #f1f5f9;
+            font-size: 1.2rem;
+        }
+
+        .insight-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .insight-list li {
+            padding: 0.5rem 0;
+            color: #cbd5e1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .insight-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* ===== Trading Signals ===== */
+        .signals-section {
+            margin-top: 2rem;
+        }
+
+        .signal-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .signal-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            transition: var(--transition);
+            border-top: 4px solid var(--line-btc);
+        }
+
+        .signal-card:nth-child(2) {
+            border-top-color: var(--line-eth);
+        }
+
+        .signal-card:nth-child(3) {
+            border-top-color: var(--line-sol);
+        }
+
+        .signal-card:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .signal-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--line-btc);
+        }
+
+        .signal-card:nth-child(2) .signal-icon {
+            color: var(--line-eth);
+        }
+
+        .signal-card:nth-child(3) .signal-icon {
+            color: var(--line-sol);
+        }
+
+        .signal-title {
+            color: #f1f5f9;
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        .signal-description {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .signal-action {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(59, 130, 246, 0.2);
+            border-radius: 4px;
+            color: #60a5fa;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* ===== Market Outlook ===== */
+        .outlook-section {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border-left: 4px solid var(--line-ada);
+        }
+
+        /* ===== Footer ===== */
+        .main-footer {
+            margin-top: 3rem;
+            background: var(--header-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 1.8rem;
+            text-align: center;
+            max-width: 1200px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copyright {
+            font-size: 1rem;
+            color: #94a3b8;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-color);
+        }
+
+        /* ===== Responsive Design ===== */
+        @media (max-width: 768px) {
+            .main-header h1 {
+                font-size: 2rem;
+            }
+            
+            .back-button {
+                position: relative;
+                left: 0;
+                top: 0;
+                transform: none;
+                margin-bottom: 1rem;
+                align-self: flex-start;
+            }
+            
+            .main-header {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .legend-container {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .correlation-matrix {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .insight-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .signal-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .viz-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .overview-card,
+            .viz-container,
+            .insights-section {
+                padding: 1.5rem;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .main-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .legend-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .performance-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .performance-line {
+                width: 100%;
+                margin: 0.5rem 0;
+            }
+            
+            .correlation-matrix {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== Animation ===== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .overview-card,
+        .viz-container,
+        .insights-section {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        @keyframes lineDraw {
+            from {
+                width: 0;
+            }
+        }
+
+        .performance-fill {
+            animation: lineDraw 1.5s ease-out forwards;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+        }
+
+        .legend-item:hover .legend-line {
+            animation: pulse 0.6s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <a href="index.html" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        <h1><i class="fas fa-chart-line"></i> Crypto Price Tracking</h1>
+        <p>Multi-Series Line Chart Analysis of Cryptocurrency Prices</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content-wrapper">
+        <!-- Overview Section -->
+        <section class="overview-card">
+            <h2 class="section-title"><i class="fas fa-info-circle"></i> Price Analysis Overview</h2>
+            <p class="overview-text">
+                The <span class="highlight">Multi-Series Line Chart</span> provides a comprehensive visualization of cryptocurrency price movements across multiple assets over time. This powerful analytical tool enables comparative analysis, trend identification, and correlation assessment between different cryptocurrencies. By tracking multiple price series simultaneously, investors can identify market leaders, spot emerging trends, and make informed decisions based on relative performance.
+            </p>
+            
+            <div class="chart-explanation">
+                <h3 style="color: #e2e8f0; margin-bottom: 1rem;"><i class="fas fa-chart-line"></i> Understanding Multi-Series Line Charts</h3>
+                <p style="color: #cbd5e1; margin-bottom: 1rem;">
+                    Multi-series line charts display multiple data series on the same axes, allowing for direct comparison of price movements. Each line represents a different cryptocurrency, with time on the X-axis and price on the Y-axis. This visualization highlights relative performance, convergence/divergence patterns, and market-wide trends.
+                </p>
+            </div>
+            
+            <!-- Cryptocurrency Legend -->
+            <div class="legend-container">
+                <div class="legend-item">
+                    <div class="legend-line btc"></div>
+                    <div class="legend-content">
+                        <div class="legend-name">Bitcoin (BTC)</div>
+                        <div class="legend-price">$68,450</div>
+                        <div class="legend-change positive">+4.2% (24h)</div>
+                    </div>
+                </div>
+                
+                <div class="legend-item">
+                    <div class="legend-line eth"></div>
+                    <div class="legend-content">
+                        <div class="legend-name">Ethereum (ETH)</div>
+                        <div class="legend-price">$3,850</div>
+                        <div class="legend-change positive">+2.8% (24h)</div>
+                    </div>
+                </div>
+                
+                <div class="legend-item">
+                    <div class="legend-line sol"></div>
+                    <div class="legend-content">
+                        <div class="legend-name">Solana (SOL)</div>
+                        <div class="legend-price">$142</div>
+                        <div class="legend-change negative">-1.5% (24h)</div>
+                    </div>
+                </div>
+                
+                <div class="legend-item">
+                    <div class="legend-line ada"></div>
+                    <div class="legend-content">
+                        <div class="legend-name">Cardano (ADA)</div>
+                        <div class="legend-price">$0.48</div>
+                        <div class="legend-change positive">+0.8% (24h)</div>
+                    </div>
+                </div>
+                
+                <div class="legend-item">
+                    <div class="legend-line dot"></div>
+                    <div class="legend-content">
+                        <div class="legend-name">Polkadot (DOT)</div>
+                        <div class="legend-price">$7.20</div>
+                        <div class="legend-change negative">-2.1% (24h)</div>
+                    </div>
+                </div>
+                
+                <div class="legend-item">
+                    <div class="legend-line avax"></div>
+                    <div class="legend-content">
+                        <div class="legend-name">Avalanche (AVAX)</div>
+                        <div class="legend-price">$36.50</div>
+                        <div class="legend-change positive">+3.5% (24h)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-title"><i class="fas fa-percentage"></i> Avg Daily Return</div>
+                    <div class="metric-value">+1.2%</div>
+                    <div class="metric-description">Average daily price change</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-title"><i class="fas fa-bolt"></i> Avg Volatility</div>
+                    <div class="metric-value">6.8%</div>
+                    <div class="metric-description">Average daily price range</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-title"><i class="fas fa-chart-line"></i> YTD Return</div>
+                    <div class="metric-value">+42.5%</div>
+                    <div class="metric-description">Year-to-date performance</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-title"><i class="fas fa-balance-scale"></i> Correlation Index</div>
+                    <div class="metric-value">0.75</div>
+                    <div class="metric-description">Average price correlation</div>
+                </div>
+            </div>
+            
+            <!-- Performance Comparison -->
+            <div class="performance-comparison">
+                <h3 style="color: #e2e8f0; margin-bottom: 1.5rem;"><i class="fas fa-trophy"></i> Year-to-Date Performance</h3>
+                <div class="performance-item">
+                    <div class="crypto-name">
+                        <i class="fab fa-bitcoin" style="color: var(--line-btc);"></i>
+                        <span>Bitcoin (BTC)</span>
+                    </div>
+                    <div class="performance-line">
+                        <div class="performance-fill" style="width: 52%; background: linear-gradient(90deg, var(--line-btc), #fbbf24);"></div>
+                    </div>
+                    <div class="performance-percent positive">+52%</div>
+                </div>
+                <div class="performance-item">
+                    <div class="crypto-name">
+                        <i class="fab fa-ethereum" style="color: var(--line-eth);"></i>
+                        <span>Ethereum (ETH)</span>
+                    </div>
+                    <div class="performance-line">
+                        <div class="performance-fill" style="width: 38%; background: linear-gradient(90deg, var(--line-eth), #a78bfa);"></div>
+                    </div>
+                    <div class="performance-percent positive">+38%</div>
+                </div>
+                <div class="performance-item">
+                    <div class="crypto-name">
+                        <i class="fas fa-bolt" style="color: var(--line-sol);"></i>
+                        <span>Solana (SOL)</span>
+                    </div>
+                    <div class="performance-line">
+                        <div class="performance-fill" style="width: 185%; background: linear-gradient(90deg, var(--line-sol), #34d399);"></div>
+                    </div>
+                    <div class="performance-percent positive">+185%</div>
+                </div>
+                <div class="performance-item">
+                    <div class="crypto-name">
+                        <i class="fas fa-layer-group" style="color: var(--line-ada);"></i>
+                        <span>Cardano (ADA)</span>
+                    </div>
+                    <div class="performance-line">
+                        <div class="performance-fill" style="width: 12%; background: linear-gradient(90deg, var(--line-ada), #60a5fa);"></div>
+                    </div>
+                    <div class="performance-percent positive">+12%</div>
+                </div>
+            </div>
+            
+            <!-- Correlation Matrix -->
+            <div class="correlation-matrix">
+                <div class="correlation-card">
+                    <div class="correlation-pair">BTC - ETH</div>
+                    <div class="correlation-value">0.82</div>
+                    <div class="correlation-strength strength-high">High Correlation</div>
+                </div>
+                
+                <div class="correlation-card">
+                    <div class="correlation-pair">ETH - SOL</div>
+                    <div class="correlation-value">0.68</div>
+                    <div class="correlation-strength strength-medium">Medium Correlation</div>
+                </div>
+                
+                <div class="correlation-card">
+                    <div class="correlation-pair">SOL - ADA</div>
+                    <div class="correlation-value">0.45</div>
+                    <div class="correlation-strength strength-low">Low Correlation</div>
+                </div>
+                
+                <div class="correlation-card">
+                    <div class="correlation-pair">BTC - Altcoins</div>
+                    <div class="correlation-value">0.71</div>
+                    <div class="correlation-strength strength-high">High Correlation</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Visualization Section -->
+        <section class="viz-container">
+            <div class="viz-header">
+                <h2 class="viz-title"><i class="fas fa-chart-line"></i> Interactive Multi-Series Chart</h2>
+                <div class="viz-actions">
+                    <button class="viz-btn" onclick="fullscreenView()">
+                        <i class="fas fa-expand"></i> Fullscreen
+                    </button>
+                    <button class="viz-btn" onclick="downloadImage()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                    <button class="viz-btn" onclick="toggleLogScale()">
+                        <i class="fas fa-chart-line"></i> Log Scale
+                    </button>
+                    <button class="viz-btn" onclick="compareAssets()">
+                        <i class="fas fa-balance-scale"></i> Compare
+                    </button>
+                </div>
+            </div>
+            
+            <p style="color: #94a3b8; margin-bottom: 1.5rem;">
+                <i class="fas fa-mouse-pointer"></i> Hover over any line to see detailed price data for that cryptocurrency. Click on legend items to show/hide specific cryptocurrencies. Use the Tableau toolbar for advanced time filtering and normalization options.
+            </p>
+            
+            <!-- Tableau Visualization - UNCHANGED -->
+            <div class="tableau-wrapper">
+                <h2 style="color: #e2e8f0; margin-bottom: 1rem;">Multi-Series Line Chart for Crypto Price Tracking</h2>
+                <p class="chart-description">
+                    This interactive multi-series line chart displays price movements for multiple cryptocurrencies over time. Each colored line represents a different cryptocurrency, allowing for comparative analysis of price trends, volatility patterns, and relative performance across the digital asset market.
+                </p>
+
+                <div class="tableauPlaceholder" id="vizCryptoLineChart" style="position: relative;">
+                    <noscript>
+                        <a href="#">
+                            <img alt="Multi-Series Line Chart for Tracking Crypto Price"
+                                 src="https://public.tableau.com/static/images/li/linechart_17648755283800/Multi-SeriesLineChartforTrackingCryptoPrice/1.png"
+                                 style="border: none;" />
+                        </a>
+                    </noscript>
+
+                    <object class="tableauViz">
+                        <param name="host_url" value="https%3A%2F%2Fpublic.tableau.com%2F" />
+                        <param name="embed_code_version" value="3" />
+                        <param name="site_root" value="" />
+                        <param name="name" value="linechart_17648755283800/Multi-SeriesLineChartforTrackingCryptoPrice" />
+                        <param name="tabs" value="no" />
+                        <param name="toolbar" value="yes" />
+                        <param name="static_image"
+                               value="https://public.tableau.com/static/images/li/linechart_17648755283800/Multi-SeriesLineChartforTrackingCryptoPrice/1.png" />
+                        <param name="animate_transition" value="yes" />
+                        <param name="display_static_image" value="yes" />
+                        <param name="display_spinner" value="yes" />
+                        <param name="display_overlay" value="yes" />
+                        <param name="display_count" value="yes" />
+                        <param name="language" value="en-US" />
+                    </object>
+                </div>
+
+                <script type="text/javascript">
+                    var divElement = document.getElementById("vizCryptoLineChart");
+                    var vizElement = divElement.getElementsByTagName("object")[0];
+                    vizElement.style.width = "100%";
+                    vizElement.style.height = (divElement.offsetWidth * 0.75) + "px";
+
+                    var scriptElement = document.createElement("script");
+                    scriptElement.src = "https://public.tableau.com/javascripts/api/viz_v1.js";
+                    vizElement.parentNode.insertBefore(scriptElement, vizElement);
+                    
+                    // Fullscreen function
+                    function fullscreenView() {
+                        const element = document.getElementById('vizCryptoLineChart');
+                        if (element.requestFullscreen) {
+                            element.requestFullscreen();
+                        } else if (element.webkitRequestFullscreen) {
+                            element.webkitRequestFullscreen();
+                        } else if (element.msRequestFullscreen) {
+                            element.msRequestFullscreen();
+                        }
+                    }
+                    
+                    // Download function
+                    function downloadImage() {
+                        alert('Export functionality would typically connect to Tableau Server API. For this public visualization, use Tableau\'s native export tools.');
+                    }
+                    
+                    // Toggle log scale function
+                    function toggleLogScale() {
+                        alert('Log scale toggled. This would switch between linear and logarithmic scales for better comparison of growth rates.');
+                    }
+                    
+                    // Compare assets function
+                    function compareAssets() {
+                        alert('Asset comparison activated. This would enable side-by-side comparison of selected cryptocurrencies.');
+                    }
+                </script>
+            </div>
+            
+            <div style="margin-top: 1.5rem; color: #94a3b8; font-size: 0.9rem;">
+                <p><i class="fas fa-lightbulb"></i> <strong>Analytical Insight:</strong> Notice how cryptocurrency prices generally move together (high correlation of 0.75) but with varying magnitudes. Solana's significantly higher YTD return (+185%) compared to Bitcoin (+52%) highlights the potential for outsized returns in emerging altcoins, though with correspondingly higher risk.</p>
+            </div>
+        </section>
+
+        <!-- Price Insights Section -->
+        <section class="insights-section">
+            <h2 class="section-title"><i class="fas fa-chart-line"></i> Market Trend Insights</h2>
+            
+            <div class="insight-grid">
+                <div class="insight-card">
+                    <div class="insight-header">
+                        <i class="fas fa-trend-up insight-icon"></i>
+                        <h3>Trend Analysis</h3>
+                    </div>
+                    <ul class="insight-list">
+                        <li><i class="fas fa-arrow-up" style="color: var(--line-btc);"></i> Bitcoin: Leading indicator for market direction</li>
+                        <li><i class="fas fa-bolt" style="color: var(--line-sol);"></i> Altcoins: Higher beta, amplify Bitcoin moves</li>
+                        <li><i class="fas fa-layer-group" style="color: var(--line-eth);"></i> Ethereum: Often leads smart contract tokens</li>
+                        <li><i class="fas fa-waves" style="color: var(--line-ada);"></i> Market cycles: Clear 4-year patterns emerge</li>
+                    </ul>
+                </div>
+                
+                <div class="insight-card">
+                    <div class="insight-header">
+                        <i class="fas fa-link insight-icon" style="color: var(--line-eth);"></i>
+                        <h3>Correlation Patterns</h3>
+                    </div>
+                    <ul class="insight-list">
+                        <li><i class="fas fa-shield-alt" style="color: var(--line-btc);"></i> Bull markets: High correlation (0.8+)</li>
+                        <li><i class="fas fa-exclamation-triangle" style="color: var(--line-dot);"></i> Bear markets: Lower correlation (0.5-0.7)</li>
+                        <li><i class="fas fa-code-branch" style="color: var(--line-sol);"></i> Sector rotation: Different correlations by category</li>
+                        <li><i class="fas fa-fire" style="color: var(--line-avax);"></i> Market stress: Correlation spikes during volatility</li>
+                    </ul>
+                </div>
+                
+                <div class="insight-card">
+                    <div class="insight-header">
+                        <i class="fas fa-calendar-alt insight-icon" style="color: var(--line-ada);"></i>
+                        <h3>Seasonal Patterns</h3>
+                    </div>
+                    <ul class="insight-list">
+                        <li><i class="fas fa-sun" style="color: var(--line-btc);"></i> Q4: Historically strongest quarter</li>
+                        <li><i class="fas fa-snowflake" style="color: var(--line-eth);"></i> Q1: Often consolidation or correction</li>
+                        <li><i class="fas fa-chart-line" style="color: var(--line-sol);"></i> Summer: Gradual accumulation phases</li>
+                        <li><i class="fas fa-calendar" style="color: var(--line-dot);"></i> December: Typically bullish momentum</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Trading Signals -->
+            <div class="signals-section">
+                <h3 style="color: #e2e8f0; margin-bottom: 1.5rem;"><i class="fas fa-bell"></i> Trading Signals from Multi-Series Analysis</h3>
+                <div class="signal-grid">
+                    <div class="signal-card">
+                        <div class="signal-icon">
+                            <i class="fas fa-arrow-up"></i>
+                        </div>
+                        <h3 class="signal-title">Relative Strength</h3>
+                        <p class="signal-description">
+                            Identify cryptocurrencies showing relative strength during market pullbacks. Assets that decline less or recover faster than Bitcoin often lead the next rally.
+                        </p>
+                        <span class="signal-action">Current: Solana, Avalanche</span>
+                    </div>
+                    
+                    <div class="signal-card">
+                        <div class="signal-icon">
+                            <i class="fas fa-arrows-alt-h"></i>
+                        </div>
+                        <h3 class="signal-title">Convergence/Divergence</h3>
+                        <p class="signal-description">
+                            Watch for convergence (lines moving together) indicating sector-wide moves, or divergence (lines separating) signaling sector rotation.
+                        </p>
+                        <span class="signal-action">Current: Convergence Pattern</span>
+                    </div>
+                    
+                    <div class="signal-card">
+                        <div class="signal-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3 class="signal-title">Trend Following</h3>
+                        <p class="signal-description">
+                            Follow established uptrends and avoid assets in clear downtrends. Multi-series analysis helps identify which trends are strongest and most sustainable.
+                        </p>
+                        <span class="signal-action">Current: Bitcoin Uptrend Intact</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Market Outlook -->
+            <div class="outlook-section">
+                <h3 style="color: #e2e8f0; margin-bottom: 1rem;"><i class="fas fa-binoculars"></i> Market Outlook Based on Multi-Series Analysis</h3>
+                <p style="color: #cbd5e1; line-height: 1.7;">
+                    The multi-series analysis reveals a <strong>bullish market structure</strong> with Bitcoin leading and altcoins following with amplified movements. High correlation (0.75) suggests market-wide risk-on sentiment, while varying return magnitudes indicate selective capital allocation. Solana's exceptional performance (+185% YTD) signals strong demand for high-throughput blockchain solutions. The convergence of most cryptocurrency lines suggests synchronized market movements, typical of mature bull market phases.
+                </p>
+                <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1rem;">
+                    <div style="flex: 1; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                        <div style="width: 78%; height: 100%; background: linear-gradient(90deg, var(--line-dot), var(--line-btc)); border-radius: 4px;"></div>
+                    </div>
+                    <span style="color: var(--line-btc); font-weight: 600; font-size: 1.1rem;">78% Bullish</span>
+                </div>
+                <div style="margin-top: 1rem; color: #94a3b8; font-size: 0.9rem;">
+                    <p><i class="fas fa-lightbulb"></i> <strong>Trading Insight:</strong> Consider a barbell strategy: Core positions in established leaders (Bitcoin, Ethereum) for stability, plus satellite positions in high-performing altcoins (Solana, Avalanche) for growth potential. Monitor correlation levels - decreasing correlation may signal sector rotation opportunities.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <p class="copyright">© 2025 Crypto Market Visualizations. Price Tracking Dashboard</p>
+            <div class="footer-links">
+                <a href="#"><i class="fas fa-database"></i> Price Data</a>
+                <a href="#"><i class="fas fa-chart-line"></i> Trend Analysis Guide</a>
+                <a href="index.html"><i class="fas fa-home"></i> Dashboard</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

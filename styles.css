@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Market Visualizations</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('C:/Users/user/Downloads/Group3visualization/images/crypto-background.jpg'); /* Absolute path for local machine */
+            background-size: cover; /* Ensures the image covers the entire page */
+            background-position: center center; /* Centers the background image */
+            background-repeat: no-repeat; /* Prevents repeating the image */
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Header */
+        header {
+            background-color: rgba(78, 115, 223, 0.7); /* Semi-transparent background to enhance text readability */
+            color: #fff;
+            padding: 50px 20px;
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: normal;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-bottom: 3px solid #3a5f9d;
+        }
+
+        header h1 {
+            font-size: 3rem;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        header p {
+            font-size: 1.2rem;
+            font-weight: 300;
+            margin-top: 10px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.6;
+        }
+
+        /* Button Container */
+        .button-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 40px;
+        }
+
+        /* Button Styles */
+        .button-container button {
+            padding: 15px 30px;
+            background-color: #4e73df;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 1rem;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .button-container button:hover {
+            background-color: #2e58b3;
+            transform: translateY(-3px);
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            background-color: #4e73df;
+            color: white;
+            padding: 20px 0;
+            font-size: 1rem;
+            border-top: 3px solid #3a5f9d;
+        }
+
+        /* Description Container */
+        .description-container {
+            margin-top: 30px;
+            text-align: center;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+            font-size: 1.2rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Crypto Market Visualizations</h1>
+        <p>Explore detailed visualizations and insights into the cryptocurrency market trends.</p>
+    </header>
+
+    <div class="description-container">
+        <h2>Project Overview</h2>
+        <p>Welcome to the Crypto Market Visualizations project! This platform presents key visual analytics to understand the dynamics of the cryptocurrency market. We offer insights into market volume, market capitalization, trading behaviors, and other essential factors impacting the crypto market.</p>
+    </div>
+
+    <div class="button-container">
+        <!-- Buttons for each visualization -->
+        <a href="Market Volume Analysis.html"><button>Market Volume Analysis</button></a>
+        <a href="Market Capitalization Treemap.html"><button>Market Capitalization Treemap</button></a>
+        <a href="Cryptocurrency Close Ratio Analysis.html"><button>Cryptocurrency Close Ratio Analysis</button></a>
+        <a href="Cryptocurrency Calculation Overview.html"><button>Cryptocurrency Calculation Overview</button></a>
+        <a href="Market vs Volume Analysis.html"><button>Market vs Volume Analysis</button></a>
+        <a href="Cryptocurrency Volume Over Time.html"><button>Cryptocurrency Volume Over Time</button></a>
+    </div>
+
+    <footer>
+        <p>© 2025 Crypto Market Visualizations</p>
+    </footer>
+</body>
+</html>

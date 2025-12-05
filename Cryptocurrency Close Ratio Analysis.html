@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptocurrency Close Ratio Analysis 2013-2018 | Historical Performance Heatmap</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== CSS Variables ===== */
+        :root {
+            --primary-color: #3a6ff8;
+            --secondary-color: #ff6b6b;
+            --dark-color: #0f172a;
+            --light-color: #f8fafc;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --header-bg: rgba(15, 23, 42, 0.9);
+            --hover-color: #2563eb;
+            --shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+            --year-2013: #ef4444;
+            --year-2014: #f59e0b;
+            --year-2015: #10b981;
+            --year-2016: #3b82f6;
+            --year-2017: #8b5cf6;
+            --year-2018: #ec4899;
+        }
+
+        /* ===== Reset & Base Styles ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--light-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Background overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('images/crypto-background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.15;
+            z-index: -1;
+        }
+
+        /* ===== Header ===== */
+        .main-header {
+            background: var(--header-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            max-width: 1200px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, 
+                var(--year-2013), 
+                var(--year-2014), 
+                var(--year-2015), 
+                var(--year-2016), 
+                var(--year-2017), 
+                var(--year-2018));
+        }
+
+        .main-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, 
+                var(--year-2013), 
+                var(--year-2014), 
+                var(--year-2015), 
+                var(--year-2016), 
+                var(--year-2017), 
+                var(--year-2018));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+            padding: 0.7rem 1.2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-button:hover {
+            background: rgba(59, 130, 246, 0.4);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        /* ===== Main Content ===== */
+        .content-wrapper {
+            max-width: 1200px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        /* ===== Overview Card ===== */
+        .overview-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+        }
+
+        .overview-text {
+            font-size: 1.1rem;
+            color: #cbd5e1;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .highlight {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        .period-badge {
+            display: inline-block;
+            background: linear-gradient(90deg, var(--year-2013), var(--year-2018));
+            color: white;
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        /* ===== Year Analysis ===== */
+        .year-analysis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .year-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: var(--radius);
+            padding: 1.2rem;
+            text-align: center;
+            transition: var(--transition);
+            border-top: 3px solid;
+            cursor: pointer;
+        }
+
+        .year-card:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .year-card[data-year="2013"] {
+            border-top-color: var(--year-2013);
+        }
+        .year-card[data-year="2014"] {
+            border-top-color: var(--year-2014);
+        }
+        .year-card[data-year="2015"] {
+            border-top-color: var(--year-2015);
+        }
+        .year-card[data-year="2016"] {
+            border-top-color: var(--year-2016);
+        }
+        .year-card[data-year="2017"] {
+            border-top-color: var(--year-2017);
+        }
+        .year-card[data-year="2018"] {
+            border-top-color: var(--year-2018);
+        }
+
+        .year-label {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: #f1f5f9;
+        }
+
+        .year-ratio {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+
+        .year-card[data-year="2013"] .year-ratio { color: var(--year-2013); }
+        .year-card[data-year="2014"] .year-ratio { color: var(--year-2014); }
+        .year-card[data-year="2015"] .year-ratio { color: var(--year-2015); }
+        .year-card[data-year="2016"] .year-ratio { color: var(--year-2016); }
+        .year-card[data-year="2017"] .year-ratio { color: var(--year-2017); }
+        .year-card[data-year="2018"] .year-ratio { color: var(--year-2018); }
+
+        .year-volatility {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
+        /* ===== Close Ratio Explanation ===== */
+        .ratio-explanation {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border-left: 4px solid var(--year-2017);
+        }
+
+        .ratio-formula {
+            font-family: 'Courier New', monospace;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            color: var(--year-2017);
+            font-size: 1.1rem;
+        }
+
+        /* ===== Heatmap Legend ===== */
+        .heatmap-legend {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .legend-label {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+        }
+
+        /* ===== Key Metrics ===== */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .metric-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border-left: 4px solid var(--year-2017);
+            transition: var(--transition);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .metric-title {
+            font-size: 1rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .metric-description {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+
+        /* ===== Visualization Container ===== */
+        .viz-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .viz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .viz-title {
+            font-size: 1.5rem;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .viz-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .viz-btn {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .viz-btn:hover {
+            background: rgba(59, 130, 246, 0.4);
+        }
+
+        /* ===== Tableau Visualization ===== */
+        .tableau-wrapper {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* ===== Performance Insights ===== */
+        .performance-insights {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .insight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .insight-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            transition: var(--transition);
+            border-top: 3px solid var(--year-2015);
+        }
+
+        .insight-card:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .insight-card:nth-child(2) {
+            border-top-color: var(--year-2017);
+        }
+
+        .insight-card:nth-child(3) {
+            border-top-color: var(--year-2018);
+        }
+
+        .insight-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .insight-icon {
+            font-size: 1.5rem;
+            color: var(--year-2015);
+        }
+
+        .insight-card:nth-child(2) .insight-icon {
+            color: var(--year-2017);
+        }
+
+        .insight-card:nth-child(3) .insight-icon {
+            color: var(--year-2018);
+        }
+
+        .insight-card h3 {
+            color: #f1f5f9;
+            font-size: 1.2rem;
+        }
+
+        .insight-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .insight-list li {
+            padding: 0.5rem 0;
+            color: #cbd5e1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .insight-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* ===== Historical Performance Table ===== */
+        .performance-table {
+            margin-top: 2rem;
+            overflow-x: auto;
+        }
+
+        .performance-table h3 {
+            margin-bottom: 1rem;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        th {
+            background: rgba(30, 41, 59, 0.8);
+            color: #e2e8f0;
+            font-weight: 600;
+        }
+
+        td {
+            color: #cbd5e1;
+        }
+
+        .positive {
+            color: var(--year-2017);
+            font-weight: 600;
+        }
+
+        .negative {
+            color: var(--year-2014);
+            font-weight: 600;
+        }
+
+        .year-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+
+        /* ===== Footer ===== */
+        .main-footer {
+            margin-top: 3rem;
+            background: var(--header-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 1.8rem;
+            text-align: center;
+            max-width: 1200px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copyright {
+            font-size: 1rem;
+            color: #94a3b8;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-color);
+        }
+
+        /* ===== Responsive Design ===== */
+        @media (max-width: 768px) {
+            .main-header h1 {
+                font-size: 2rem;
+            }
+            
+            .back-button {
+                position: relative;
+                left: 0;
+                top: 0;
+                transform: none;
+                margin-bottom: 1rem;
+                align-self: flex-start;
+            }
+            
+            .main-header {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .year-analysis {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .insight-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .viz-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .heatmap-legend {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .overview-card,
+            .viz-container,
+            .performance-insights {
+                padding: 1.5rem;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .main-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .year-analysis {
+                grid-template-columns: 1fr;
+            }
+            
+            table {
+                font-size: 0.9rem;
+            }
+            
+            th, td {
+                padding: 0.8rem;
+            }
+        }
+
+        /* ===== Animation ===== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .overview-card,
+        .viz-container,
+        .performance-insights {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <a href="index.html" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        <h1><i class="fas fa-fire"></i> Close Ratio Analysis 2013-2018</h1>
+        <p>Historical Performance Heatmap of Early Cryptocurrency Markets</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content-wrapper">
+        <!-- Overview Section -->
+        <section class="overview-card">
+            <div class="period-badge">Analysis Period: 2013-2018</div>
+            <h2 class="section-title"><i class="fas fa-info-circle"></i> 2013-2018 Close Ratio Analysis</h2>
+            <p class="overview-text">
+                The <span class="highlight">Cryptocurrency Close Ratio Heatmap 2013-2018</span> reveals the dramatic performance patterns of early cryptocurrencies during crypto's formative years. This heatmap shows how close ratios evolved from Bitcoin's early volatility through the 2017 bull market and subsequent correction.
+            </p>
+            
+            <!-- Year Analysis -->
+            <div class="year-analysis">
+                <div class="year-card" data-year="2013" onclick="showYearRatios('2013')">
+                    <div class="year-label">2013</div>
+                    <div class="year-ratio">1.25</div>
+                    <div class="year-volatility">High Volatility</div>
+                </div>
+                
+                <div class="year-card" data-year="2014" onclick="showYearRatios('2014')">
+                    <div class="year-label">2014</div>
+                    <div class="year-ratio">0.65</div>
+                    <div class="year-volatility">Bear Market</div>
+                </div>
+                
+                <div class="year-card" data-year="2015" onclick="showYearRatios('2015')">
+                    <div class="year-label">2015</div>
+                    <div class="year-ratio">0.95</div>
+                    <div class="year-volatility">Recovery</div>
+                </div>
+                
+                <div class="year-card" data-year="2016" onclick="showYearRatios('2016')">
+                    <div class="year-label">2016</div>
+                    <div class="year-ratio">1.15</div>
+                    <div class="year-volatility">Pre-Halving</div>
+                </div>
+                
+                <div class="year-card" data-year="2017" onclick="showYearRatios('2017')">
+                    <div class="year-label">2017</div>
+                    <div class="year-ratio">1.45</div>
+                    <div class="year-volatility">Bull Market</div>
+                </div>
+                
+                <div class="year-card" data-year="2018" onclick="showYearRatios('2018')">
+                    <div class="year-label">2018</div>
+                    <div class="year-ratio">0.85</div>
+                    <div class="year-volatility">Correction</div>
+                </div>
+            </div>
+            
+            <div class="ratio-explanation">
+                <h3 style="color: #e2e8f0; margin-bottom: 1rem;"><i class="fas fa-calculator"></i> Close Ratio Formula</h3>
+                <p style="color: #cbd5e1; margin-bottom: 1rem;">
+                    Close Ratio measures daily performance by comparing closing price to opening price. In early cryptocurrency markets, ratios showed extreme volatility with values ranging from 0.5 (50% daily decline) to 1.8 (80% daily gain).
+                </p>
+                <div class="ratio-formula">
+                    Close Ratio = Closing Price ÷ Opening Price
+                </div>
+                <p style="color: #cbd5e1; margin-top: 1rem; font-size: 0.9rem;">
+                    <i class="fas fa-info-circle"></i> Ratio > 1: Positive day (green), Ratio < 1: Negative day (red)
+                </p>
+            </div>
+            
+            <!-- Heatmap Legend -->
+            <div class="heatmap-legend">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--year-2014);"></div>
+                    <span class="legend-label">Bear Market (2014, 2018)</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--year-2016);"></div>
+                    <span class="legend-label">Moderate Performance</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: var(--year-2017);"></div>
+                    <span class="legend-label">Bull Market (2017)</span>
+                </div>
+            </div>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-title"><i class="fas fa-calendar-alt"></i> Analysis Period</div>
+                    <div class="metric-value">2013-2018</div>
+                    <div class="metric-description">Complete early market cycle</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-title"><i class="fas fa-coins"></i> Historical Assets</div>
+                    <div class="metric-value">15+</div>
+                    <div class="metric-description">Early cryptocurrencies analyzed</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-title"><i class="fas fa-chart-area"></i> Peak Volatility</div>
+                    <div class="metric-value">2017</div>
+                    <div class="metric-description">Highest close ratio variance</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-title"><i class="fas fa-percentage"></i> Ratio Range</div>
+                    <div class="metric-value">0.5 - 1.8</div>
+                    <div class="metric-description">Extreme early market moves</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Visualization Section -->
+        <section class="viz-container">
+            <div class="viz-header">
+                <h2 class="viz-title"><i class="fas fa-fire"></i> Historical Close Ratio Heatmap</h2>
+                <div class="viz-actions">
+                    <button class="viz-btn" onclick="fullscreenView()">
+                        <i class="fas fa-expand"></i> Fullscreen
+                    </button>
+                    <button class="viz-btn" onclick="downloadImage()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                    <button class="viz-btn" onclick="filterByYear()">
+                        <i class="fas fa-calendar"></i> Filter Year
+                    </button>
+                    <button class="viz-btn" onclick="show2017Ratios()">
+                        <i class="fas fa-chart-bar"></i> 2017 View
+                    </button>
+                </div>
+            </div>
+            
+            <p style="color: #94a3b8; margin-bottom: 1.5rem;">
+                <i class="fas fa-mouse-pointer"></i> This heatmap shows close ratio performance from 2013-2018. Hover over cells to see exact ratio values. Green cells indicate positive days (close > open), red cells indicate negative days.
+            </p>
+            
+            <!-- Tableau Visualization -->
+            <div class="tableau-wrapper">
+                <h2>Cryptocurrency Close Ratio Analysis 2013-2018</h2>
+                <p><strong>Historical Context:</strong> This heatmap visualization shows the extreme volatility of early cryptocurrency markets (2013-2018). Each cell represents a cryptocurrency's close ratio for a specific year, with color intensity showing performance strength. The visualization reveals the dramatic 2014 bear market, the recovery of 2015-2016, the explosive 2017 bull market, and the 2018 correction.</p>
+
+                <div class='tableauPlaceholder' id='viz1764804811341' style='position: relative'>
+                    <noscript>
+                        <a href='#'>
+                            <img alt=' ' src='https://public.tableau.com/static/images/3_/3_17648047663600/CryptocurrencyCloseRatioAnalysis/1_rss.png' style='border: none' />
+                        </a>
+                    </noscript>
+                    <object class='tableauViz' style='display:none; width: 100%; height: 100%;'>
+                        <param name='host_url' value='https://public.tableau.com/' />
+                        <param name='embed_code_version' value='3' />
+                        <param name='site_root' value='' />
+                        <param name='name' value='3_17648047663600/CryptocurrencyCloseRatioAnalysis' />
+                        <param name='tabs' value='no' />
+                        <param name='toolbar' value='no' />
+                        <param name='static_image' value='https://public.tableau.com/static/images/3_/3_17648047663600/CryptocurrencyCloseRatioAnalysis/1.png' />
+                        <param name='animate_transition' value='yes' />
+                        <param name='display_static_image' value='yes' />
+                        <param name='display_spinner' value='yes' />
+                        <param name='display_overlay' value='yes' />
+                        <param name='display_count' value='yes' />
+                        <param name='language' value='en-US' />
+                    </object>
+                </div>
+
+                <script type='text/javascript'>
+                    var divElement = document.getElementById('viz1764804811341'); 
+                    var vizElement = divElement.getElementsByTagName('object')[0]; 
+                    vizElement.style.width='100%'; 
+                    vizElement.style.height=(divElement.offsetWidth*0.75)+'px'; 
+                    var scriptElement = document.createElement('script'); 
+                    scriptElement.src = 'https://public.tableau.com/javascripts/api/viz_v1.js'; 
+                    vizElement.parentNode.insertBefore(scriptElement, vizElement);
+                    
+                    function fullscreenView() {
+                        const element = document.getElementById('viz1764804811341');
+                        if (element.requestFullscreen) {
+                            element.requestFullscreen();
+                        } else if (element.webkitRequestFullscreen) {
+                            element.webkitRequestFullscreen();
+                        } else if (element.msRequestFullscreen) {
+                            element.msRequestFullscreen();
+                        }
+                    }
+                    
+                    function downloadImage() {
+                        alert('Export functionality would typically connect to Tableau Server API. For this public visualization, use Tableau\'s native export tools.');
+                    }
+                    
+                    function filterByYear() {
+                        alert('Year filter activated. Filter to see close ratios for specific years (2014 bear market, 2017 bull market, etc.).');
+                    }
+                    
+                    function show2017Ratios() {
+                        alert('2017 close ratios view. Shows the most extreme positive ratios of the 2013-2018 period, with many cryptocurrencies showing ratios above 1.4.');
+                    }
+                </script>
+            </div>
+            
+            <div style="margin-top: 1.5rem; color: #94a3b8; font-size: 0.9rem;">
+                <p><i class="fas fa-lightbulb"></i> <strong>Historical Insight:</strong> The heatmap clearly shows the 2014 bear market (mostly red), the 2017 bull market (mostly dark green), and how different cryptocurrencies performed during these extreme market conditions.</p>
+            </div>
+        </section>
+
+        <!-- Performance Insights Section -->
+        <section class="performance-insights">
+            <h2 class="section-title"><i class="fas fa-chart-line"></i> 2013-2018 Performance Patterns</h2>
+            
+            <div class="insight-grid">
+                <div class="insight-card">
+                    <div class="insight-header">
+                        <i class="fas fa-chart-pie insight-icon"></i>
+                        <h3>Early Market Volatility (2013-2015)</h3>
+                    </div>
+                    <ul class="insight-list">
+                        <li><i class="fas fa-bitcoin" style="color: var(--year-2013);"></i> 2013: Extreme volatility, ratios 0.7-1.5</li>
+                        <li><i class="fas fa-exchange-alt" style="color: var(--year-2014);"></i> 2014: Bear market, most ratios below 0.8</li>
+                        <li><i class="fas fa-cube" style="color: var(--year-2015);"></i> 2015: Recovery begins, ratios near 1.0</li>
+                        <li><i class="fas fa-chart-line" style="color: var(--year-2016);"></i> Early altcoins show higher volatility than Bitcoin</li>
+                    </ul>
+                </div>
+                
+                <div class="insight-card">
+                    <div class="insight-header">
+                        <i class="fas fa-bolt insight-icon"></i>
+                        <h3>Bull Market Performance (2016-2017)</h3>
+                    </div>
+                    <ul class="insight-list">
+                        <li><i class="fas fa-chart-line" style="color: var(--year-2016);"></i> 2016: Pre-halving buildup, ratios 1.1-1.3</li>
+                        <li><i class="fas fa-rocket" style="color: var(--year-2017);"></i> 2017: Extreme ratios 1.3-1.8 common</li>
+                        <li><i class="fas fa-layer-group" style="color: var(--year-2017);"></i> Altcoins outperform Bitcoin significantly</li>
+                        <li><i class="fas fa-coins" style="color: var(--year-2017);"></i> ICO tokens show highest ratios (1.5+)</li>
+                    </ul>
+                </div>
+                
+                <div class="insight-card">
+                    <div class="insight-header">
+                        <i class="fas fa-filter insight-icon"></i>
+                        <h3>Market Correction (2018)</h3>
+                    </div>
+                    <ul class="insight-list">
+                        <li><i class="fas fa-arrow-down" style="color: var(--year-2018);"></i> Ratios drop to 0.7-0.9 range</li>
+                        <li><i class="fas fa-filter" style="color: var(--year-2018);"></i> Highest volatility assets correct most</li>
+                        <li><i class="fas fa-arrows-alt-h" style="color: var(--year-2018);"></i> Bitcoin shows relative stability</li>
+                        <li><i class="fas fa-chart-bar" style="color: var(--year-2018);"></i> Many 2017 ICOs show ratios below 0.5</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Historical Performance Table -->
+            <div class="performance-table">
+                <h3><i class="fas fa-table"></i> Historical Performance Summary</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cryptocurrency</th>
+                            <th>2014 Ratio</th>
+                            <th>2017 Ratio</th>
+                            <th>2018 Ratio</th>
+                            <th>Volatility Trend</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="year-indicator" style="background: var(--year-2013);"></span>Bitcoin (BTC)</td>
+                            <td class="negative">0.65</td>
+                            <td class="positive">1.45</td>
+                            <td class="negative">0.85</td>
+                            <td>Decreasing over time</td>
+                        </tr>
+                        <tr>
+                            <td><span class="year-indicator" style="background: var(--year-2015);"></span>Ethereum (ETH)</td>
+                            <td>-</td>
+                            <td class="positive">1.68</td>
+                            <td class="negative">0.82</td>
+                            <td>Peak in 2017</td>
+                        </tr>
+                        <tr>
+                            <td><span class="year-indicator" style="background: var(--year-2013);"></span>Litecoin (LTC)</td>
+                            <td class="negative">0.58</td>
+                            <td class="positive">1.52</td>
+                            <td class="negative">0.78</td>
+                            <td>Consistently high</td>
+                        </tr>
+                        <tr>
+                            <td><span class="year-indicator" style="background: var(--year-2017);"></span>Ripple (XRP)</td>
+                            <td>-</td>
+                            <td class="positive">1.72</td>
+                            <td class="negative">0.75</td>
+                            <td>Extreme in 2017</td>
+                        </tr>
+                        <tr>
+                            <td><span class="year-indicator" style="background: var(--year-2013);"></span>Monero (XMR)</td>
+                            <td class="negative">0.72</td>
+                            <td class="positive">1.38</td>
+                            <td class="negative">0.88</td>
+                            <td>Moderate volatility</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="color: #94a3b8; font-size: 0.9rem; margin-top: 1rem;">
+                    <i class="fas fa-info-circle"></i> Note: "-" indicates cryptocurrency not yet launched or insufficient data for that year
+                </p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <p class="copyright">© 2025 Historical Crypto Market Analysis 2013-2018. Close Ratio Analysis Dashboard</p>
+            <div class="footer-links">
+                <a href="#"><i class="fas fa-archive"></i> Historical Data</a>
+                <a href="#"><i class="fas fa-chart-line"></i> Performance Analysis</a>
+                <a href="index.html"><i class="fas fa-home"></i> Dashboard</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function showYearRatios(year) {
+            const yearDetails = {
+                '2013': '2013: Early Bitcoin market. Extreme volatility with ratios from 0.7 to 1.5. Mt. Gox handles majority of trading. Market cap: $1.5B.',
+                '2014': '2014: Bear market following Mt. Gox collapse. Most ratios below 0.8. Bitcoin loses 50% value. Market cap drops to $5B.',
+                '2015': '2015: Recovery year. Ratios stabilize around 1.0. Ethereum launches (July). Market cap reaches $8B.',
+                '2016': '2016: Pre-halving anticipation. Ratios range 1.1-1.3. Bitcoin dominance begins decreasing. Market cap: $15B.',
+                '2017': '2017: Bull market peak. Extreme ratios 1.3-1.8 common. Altcoins outperform Bitcoin. ICO boom. Market cap peaks at $820B.',
+                '2018': '2018: Correction year. Ratios drop to 0.7-0.9. Bitcoin shows relative stability. Many ICOs collapse. Market cap settles at $200B.'
+            };
+            alert(yearDetails[year] || 'Select a year between 2013-2018 to see close ratio patterns.');
+        }
+    </script>
+</body>
+</html>

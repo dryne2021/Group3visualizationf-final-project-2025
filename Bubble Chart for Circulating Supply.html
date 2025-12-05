@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Circulating Supply Analysis | Cryptocurrency Supply Dynamics Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== CSS Variables ===== */
+        :root {
+            --primary-color: #3a6ff8;
+            --secondary-color: #10b981;
+            --dark-color: #0f172a;
+            --light-color: #f8fafc;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --header-bg: rgba(15, 23, 42, 0.9);
+            --hover-color: #2563eb;
+            --shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+            --bubble-large: #ef4444;
+            --bubble-medium: #f59e0b;
+            --bubble-small: #3b82f6;
+            --bubble-micro: #8b5cf6;
+            --supply-high: #10b981;
+            --supply-low: #ec4899;
+        }
+
+        /* ===== Reset & Base Styles ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--light-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Background overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('images/crypto-background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.15;
+            z-index: -1;
+        }
+
+        /* ===== Header ===== */
+        .main-header {
+            background: var(--header-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            max-width: 1200px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .main-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .back-button {
+            position: absolute;
+            left: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+            padding: 0.7rem 1.2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-button:hover {
+            background: rgba(59, 130, 246, 0.4);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        /* ===== Main Content ===== */
+        .content-wrapper {
+            max-width: 1200px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+
+        /* ===== Overview Card ===== */
+        .overview-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--primary-color);
+        }
+
+        .overview-text {
+            font-size: 1.1rem;
+            color: #cbd5e1;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .highlight {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        /* ===== Bubble Chart Explanation ===== */
+        .chart-explanation {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border-left: 4px solid var(--bubble-medium);
+        }
+
+        /* ===== Supply Categories Legend ===== */
+        .legend-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0.8rem;
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .legend-item:hover {
+            background: rgba(30, 41, 59, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .legend-bubble {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: white;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .legend-bubble.large {
+            background: var(--bubble-large);
+            width: 40px;
+            height: 40px;
+        }
+
+        .legend-bubble.medium {
+            background: var(--bubble-medium);
+            width: 30px;
+            height: 30px;
+        }
+
+        .legend-bubble.small {
+            background: var(--bubble-small);
+            width: 20px;
+            height: 20px;
+        }
+
+        .legend-bubble.micro {
+            background: var(--bubble-micro);
+            width: 10px;
+            height: 10px;
+        }
+
+        .legend-content {
+            flex: 1;
+        }
+
+        .legend-title {
+            color: #f1f5f9;
+            font-weight: 500;
+            margin-bottom: 2px;
+            font-size: 0.95rem;
+        }
+
+        .legend-description {
+            color: #94a3b8;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        /* ===== Supply Metrics ===== */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .metric-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            border-left: 4px solid var(--primary-color);
+            transition: var(--transition);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .metric-title {
+            font-size: 1rem;
+            color: #94a3b8;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .metric-description {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+
+        /* ===== Supply Distribution ===== */
+        .supply-distribution {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .supply-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .supply-item:last-child {
+            border-bottom: none;
+        }
+
+        .crypto-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #f1f5f9;
+            min-width: 150px;
+        }
+
+        .supply-bar {
+            flex: 1;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            margin: 0 1rem;
+            overflow: hidden;
+        }
+
+        .supply-fill {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 1s ease;
+        }
+
+        .supply-amount {
+            color: var(--secondary-color);
+            font-weight: 600;
+            min-width: 120px;
+            text-align: right;
+            font-size: 1.1rem;
+        }
+
+        /* ===== Inflation Analysis ===== */
+        .inflation-analysis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .inflation-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: 8px;
+            padding: 1.2rem;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .inflation-card:hover {
+            background: rgba(30, 41, 59, 0.9);
+            transform: translateY(-3px);
+        }
+
+        .inflation-icon {
+            font-size: 2rem;
+            margin-bottom: 0.8rem;
+            color: var(--supply-high);
+        }
+
+        .inflation-card:nth-child(2) .inflation-icon {
+            color: var(--supply-low);
+        }
+
+        .inflation-card:nth-child(3) .inflation-icon {
+            color: var(--bubble-medium);
+        }
+
+        .inflation-title {
+            color: #f1f5f9;
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .inflation-value {
+            color: var(--secondary-color);
+            font-weight: 700;
+            font-size: 1.4rem;
+        }
+
+        /* ===== Visualization Container ===== */
+        .viz-container {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .viz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .viz-title {
+            font-size: 1.5rem;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .viz-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .viz-btn {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #60a5fa;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .viz-btn:hover {
+            background: rgba(59, 130, 246, 0.4);
+        }
+
+        /* ===== Tableau Visualization ===== */
+        .tableau-wrapper {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: center;
+        }
+
+        .chart-description {
+            color: #cbd5e1;
+            margin-bottom: 1.5rem;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        /* ===== Supply Insights ===== */
+        .insights-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .insight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .insight-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            transition: var(--transition);
+        }
+
+        .insight-card:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .insight-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .insight-icon {
+            font-size: 1.5rem;
+            color: var(--bubble-large);
+        }
+
+        .insight-card h3 {
+            color: #f1f5f9;
+            font-size: 1.2rem;
+        }
+
+        .insight-list {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .insight-list li {
+            padding: 0.5rem 0;
+            color: #cbd5e1;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .insight-list li:last-child {
+            border-bottom: none;
+        }
+
+        /* ===== Tokenomics Analysis ===== */
+        .tokenomics-section {
+            margin-top: 2rem;
+        }
+
+        .tokenomics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .tokenomics-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            transition: var(--transition);
+            border-top: 4px solid var(--bubble-large);
+        }
+
+        .tokenomics-card:nth-child(2) {
+            border-top-color: var(--bubble-medium);
+        }
+
+        .tokenomics-card:nth-child(3) {
+            border-top-color: var(--bubble-small);
+        }
+
+        .tokenomics-card:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 41, 59, 0.9);
+        }
+
+        .tokenomics-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--bubble-large);
+        }
+
+        .tokenomics-card:nth-child(2) .tokenomics-icon {
+            color: var(--bubble-medium);
+        }
+
+        .tokenomics-card:nth-child(3) .tokenomics-icon {
+            color: var(--bubble-small);
+        }
+
+        .tokenomics-title {
+            color: #f1f5f9;
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            font-weight: 600;
+        }
+
+        .tokenomics-description {
+            color: #cbd5e1;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .tokenomics-example {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(59, 130, 246, 0.2);
+            border-radius: 4px;
+            color: #60a5fa;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        /* ===== Supply Health ===== */
+        .health-section {
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border-left: 4px solid var(--supply-high);
+        }
+
+        /* ===== Footer ===== */
+        .main-footer {
+            margin-top: 3rem;
+            background: var(--header-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 1.8rem;
+            text-align: center;
+            max-width: 1200px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .copyright {
+            font-size: 1rem;
+            color: #94a3b8;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-color);
+        }
+
+        /* ===== Responsive Design ===== */
+        @media (max-width: 768px) {
+            .main-header h1 {
+                font-size: 2rem;
+            }
+            
+            .back-button {
+                position: relative;
+                left: 0;
+                top: 0;
+                transform: none;
+                margin-bottom: 1rem;
+                align-self: flex-start;
+            }
+            
+            .main-header {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .legend-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .inflation-analysis {
+                grid-template-columns: 1fr;
+            }
+            
+            .insight-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .tokenomics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .viz-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .overview-card,
+            .viz-container,
+            .insights-section {
+                padding: 1.5rem;
+            }
+            
+            .section-title {
+                font-size: 1.5rem;
+            }
+            
+            .main-header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .supply-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .supply-bar {
+                width: 100%;
+                margin: 0.5rem 0;
+            }
+        }
+
+        /* ===== Animation ===== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .overview-card,
+        .viz-container,
+        .insights-section {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+
+        @keyframes barGrow {
+            from {
+                width: 0;
+            }
+        }
+
+        .supply-fill {
+            animation: barGrow 1.5s ease-out forwards;
+        }
+
+        @keyframes bubblePulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .legend-bubble:hover {
+            animation: bubblePulse 0.6s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="main-header">
+        <a href="index.html" class="back-button">
+            <i class="fas fa-arrow-left"></i> Back to Dashboard
+        </a>
+        <h1><i class="fas fa-bullseye"></i> Circulating Supply Analysis</h1>
+        <p>Bubble Chart Visualization of Cryptocurrency Supply Dynamics</p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="content-wrapper">
+        <!-- Overview Section -->
+        <section class="overview-card">
+            <h2 class="section-title"><i class="fas fa-info-circle"></i> Supply Dynamics Overview</h2>
+            <p class="overview-text">
+                The <span class="highlight">Circulating Supply Bubble Chart</span> provides a comprehensive visualization of cryptocurrency supply distribution and tokenomics. This interactive chart displays circulating supply across major cryptocurrencies, with bubble sizes representing relative supply amounts and colors indicating different supply characteristics. Understanding supply dynamics is crucial for assessing scarcity, inflation rates, and long-term value potential in cryptocurrency investments.
+            </p>
+            
+            <div class="chart-explanation">
+                <h3 style="color: #e2e8f0; margin-bottom: 1rem;"><i class="fas fa-bullseye"></i> Understanding Bubble Charts</h3>
+                <p style="color: #cbd5e1; margin-bottom: 1rem;">
+                    Bubble charts visualize three dimensions of data: X and Y positions plus bubble size. In this visualization, bubble positions may represent different cryptocurrencies, bubble sizes show relative circulating supply, and colors indicate supply characteristics like scarcity, inflation rates, or market cap ratios. Larger bubbles represent cryptocurrencies with higher circulating supply.
+                </p>
+            </div>
+            
+            <!-- Supply Categories Legend -->
+            <div class="legend-container">
+                <div class="legend-item">
+                    <div class="legend-bubble large">
+                        21M
+                    </div>
+                    <div class="legend-content">
+                        <div class="legend-title">Large Supply</div>
+                        <div class="legend-description">Bitcoin, Tether, etc. (1M+ coins)</div>
+                    </div>
+                </div>
+                
+                <div class="legend-item">
+                    <div class="legend-bubble medium">
+                        120M
+                    </div>
+                    <div class="legend-content">
+                        <div class="legend-title">Medium Supply</div>
+                        <div class="legend-description">Ethereum, Cardano, etc. (10M-1B coins)</div>
+                    </div>
+                </div>
+                
+                <div class="legend-item">
+                    <div class="legend-bubble small">
+                        45B
+                    </div>
+                    <div class="legend-content">
+                        <div class="legend-title">Small Supply</div>
+                        <div class="legend-description">XRP, Dogecoin, etc. (1B-100B coins)</div>
+                    </div>
+                </div>
+                
+                <div class="legend-item">
+                    <div class="legend-bubble micro">
+                        100B+
+                    </div>
+                    <div class="legend-content">
+                        <div class="legend-title">Micro Supply</div>
+                        <div class="legend-description">Low-value tokens (100B+ coins)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-title"><i class="fas fa-coins"></i> Total Circulating Supply</div>
+                    <div class="metric-value">1.8T</div>
+                    <div class="metric-description">Total coins/tokens in circulation</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-title"><i class="fas fa-percentage"></i> Avg Annual Inflation</div>
+                    <div class="metric-value">3.8%</div>
+                    <div class="metric-description">Average new supply per year</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-title"><i class="fas fa-balance-scale"></i> Supply Concentration</div>
+                    <div class="metric-value">0.42</div>
+                    <div class="metric-description">Gini coefficient of supply distribution</div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-title"><i class="fas fa-chart-pie"></i> Assets Analyzed</div>
+                    <div class="metric-value">50+</div>
+                    <div class="metric-description">Major cryptocurrencies</div>
+                </div>
+            </div>
+            
+            <!-- Supply Distribution -->
+            <div class="supply-distribution">
+                <h3 style="color: #e2e8f0; margin-bottom: 1.5rem;"><i class="fas fa-chart-bar"></i> Top Cryptocurrency Supply</h3>
+                <div class="supply-item">
+                    <div class="crypto-name">
+                        <i class="fab fa-bitcoin" style="color: #f59e0b;"></i>
+                        <span>Bitcoin (BTC)</span>
+                    </div>
+                    <div class="supply-bar">
+                        <div class="supply-fill" style="width: 19.5%; background: linear-gradient(90deg, #f59e0b, #fbbf24);"></div>
+                    </div>
+                    <div class="supply-amount">19.5M / 21M</div>
+                </div>
+                <div class="supply-item">
+                    <div class="crypto-name">
+                        <i class="fab fa-ethereum" style="color: #8b5cf6;"></i>
+                        <span>Ethereum (ETH)</span>
+                    </div>
+                    <div class="supply-bar">
+                        <div class="supply-fill" style="width: 120%; background: linear-gradient(90deg, #8b5cf6, #a78bfa);"></div>
+                    </div>
+                    <div class="supply-amount">120M / No Max</div>
+                </div>
+                <div class="supply-item">
+                    <div class="crypto-name">
+                        <i class="fas fa-coins" style="color: #3b82f6;"></i>
+                        <span>XRP (XRP)</span>
+                    </div>
+                    <div class="supply-bar">
+                        <div class="supply-fill" style="width: 52%; background: linear-gradient(90deg, #3b82f6, #60a5fa);"></div>
+                    </div>
+                    <div class="supply-amount">52B / 100B</div>
+                </div>
+                <div class="supply-item">
+                    <div class="crypto-name">
+                        <i class="fas fa-dog" style="color: #10b981;"></i>
+                        <span>Dogecoin (DOGE)</span>
+                    </div>
+                    <div class="supply-bar">
+                        <div class="supply-fill" style="width: 142%; background: linear-gradient(90deg, #10b981, #34d399);"></div>
+                    </div>
+                    <div class="supply-amount">142B / No Max</div>
+                </div>
+            </div>
+            
+            <!-- Inflation Analysis -->
+            <div class="inflation-analysis">
+                <div class="inflation-card">
+                    <div class="inflation-icon">
+                        <i class="fas fa-arrow-up"></i>
+                    </div>
+                    <div class="inflation-title">High Inflation</div>
+                    <div class="inflation-value">>10%</div>
+                </div>
+                
+                <div class="inflation-card">
+                    <div class="inflation-icon">
+                        <i class="fas fa-balance-scale"></i>
+                    </div>
+                    <div class="inflation-title">Moderate Inflation</div>
+                    <div class="inflation-value">2-10%</div>
+                </div>
+                
+                <div class="inflation-card">
+                    <div class="inflation-icon">
+                        <i class="fas fa-arrow-down"></i>
+                    </div>
+                    <div class="inflation-title">Deflationary</div>
+                    <div class="inflation-value"><2%</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Visualization Section -->
+        <section class="viz-container">
+            <div class="viz-header">
+                <h2 class="viz-title"><i class="fas fa-bullseye"></i> Interactive Supply Bubble Chart</h2>
+                <div class="viz-actions">
+                    <button class="viz-btn" onclick="fullscreenView()">
+                        <i class="fas fa-expand"></i> Fullscreen
+                    </button>
+                    <button class="viz-btn" onclick="downloadImage()">
+                        <i class="fas fa-download"></i> Export
+                    </button>
+                    <button class="viz-btn" onclick="toggleLabels()">
+                        <i class="fas fa-tag"></i> Labels
+                    </button>
+                    <button class="viz-btn" onclick="filterBySupply()">
+                        <i class="fas fa-filter"></i> Filter
+                    </button>
+                </div>
+            </div>
+            
+            <p style="color: #94a3b8; margin-bottom: 1.5rem;">
+                <i class="fas fa-mouse-pointer"></i> Hover over any bubble to see detailed supply data, inflation rates, and market cap ratios. Click on bubbles to isolate specific cryptocurrencies. Use the Tableau toolbar for advanced supply range filtering and comparison tools.
+            </p>
+            
+            <!-- Tableau Visualization - UNCHANGED -->
+            <div class="tableau-wrapper">
+                <h2 style="color: #e2e8f0; margin-bottom: 1rem;">Circulating Supply Bubble Chart</h2>
+                <p class="chart-description">
+                    This interactive bubble chart visualization displays circulating supply data for major cryptocurrencies. Bubble sizes represent relative supply amounts, while positions and colors indicate different supply characteristics such as scarcity levels, inflation rates, and market cap ratios.
+                </p>
+
+                <div class="tableauPlaceholder" id="vizBubbleChart" style="position: relative;">
+                    <noscript>
+                        <a href="#">
+                            <img alt="Bubble Chart for Circulating Supply"
+                                 src="https://public.tableau.com/static/images/bu/buble_17648758737640/BubbleChartforCirculatingSupply/1.png"
+                                 style="border: none;" />
+                        </a>
+                    </noscript>
+
+                    <object class="tableauViz">
+                        <param name="host_url" value="https%3A%2F%2Fpublic.tableau.com%2F" />
+                        <param name="embed_code_version" value="3" />
+                        <param name="site_root" value="" />
+                        <param name="name" value="buble_17648758737640/BubbleChartforCirculatingSupply" />
+                        <param name="tabs" value="no" />
+                        <param name="toolbar" value="yes" />
+                        <param name="static_image"
+                               value="https://public.tableau.com/static/images/bu/buble_17648758737640/BubbleChartforCirculatingSupply/1.png" />
+                        <param name="animate_transition" value="yes" />
+                        <param name="display_static_image" value="yes" />
+                        <param name="display_spinner" value="yes" />
+                        <param name="display_overlay" value="yes" />
+                        <param name="display_count" value="yes" />
+                        <param name="language" value="en-US" />
+                    </object>
+                </div>
+
+                <script type="text/javascript">
+                    var divElement = document.getElementById("vizBubbleChart");
+                    var vizElement = divElement.getElementsByTagName("object")[0];
+                    vizElement.style.width = "100%";
+                    vizElement.style.height = (divElement.offsetWidth * 0.75) + "px";
+
+                    var scriptElement = document.createElement("script");
+                    scriptElement.src = "https://public.tableau.com/javascripts/api/viz_v1.js";
+                    vizElement.parentNode.insertBefore(scriptElement, vizElement);
+                    
+                    // Fullscreen function
+                    function fullscreenView() {
+                        const element = document.getElementById('vizBubbleChart');
+                        if (element.requestFullscreen) {
+                            element.requestFullscreen();
+                        } else if (element.webkitRequestFullscreen) {
+                            element.webkitRequestFullscreen();
+                        } else if (element.msRequestFullscreen) {
+                            element.msRequestFullscreen();
+                        }
+                    }
+                    
+                    // Download function
+                    function downloadImage() {
+                        alert('Export functionality would typically connect to Tableau Server API. For this public visualization, use Tableau\'s native export tools.');
+                    }
+                    
+                    // Toggle labels function
+                    function toggleLabels() {
+                        alert('Label display toggled. This would show/hide cryptocurrency names and supply amounts on the bubble chart.');
+                    }
+                    
+                    // Filter by supply function
+                    function filterBySupply() {
+                        alert('Supply filter activated. This would allow filtering by circulating supply range (e.g., <1M, 1M-1B, >1B).');
+                    }
+                </script>
+            </div>
+            
+            <div style="margin-top: 1.5rem; color: #94a3b8; font-size: 0.9rem;">
+                <p><i class="fas fa-lightbulb"></i> <strong>Analytical Insight:</strong> Notice the extreme variation in supply sizes - from Bitcoin's scarce 21 million maximum to Dogecoin's effectively unlimited supply. This supply scarcity is a key factor in Bitcoin's value proposition and price appreciation potential.</p>
+            </div>
+        </section>
+
+        <!-- Supply Insights Section -->
+        <section class="insights-section">
+            <h2 class="section-title"><i class="fas fa-chart-line"></i> Tokenomics Insights</h2>
+            
+            <div class="insight-grid">
+                <div class="insight-card">
+                    <div class="insight-header">
+                        <i class="fas fa-coins insight-icon"></i>
+                        <h3>Supply Scarcity Analysis</h3>
+                    </div>
+                    <ul class="insight-list">
+                        <li><i class="fas fa-gem" style="color: var(--bubble-large);"></i> Bitcoin: Fixed supply (21M) creates digital scarcity</li>
+                        <li><i class="fas fa-infinity" style="color: var(--bubble-medium);"></i> Ethereum: No hard cap, controlled inflation</li>
+                        <li><i class="fas fa-layer-group" style="color: var(--bubble-small);"></i> XRP: Pre-mined, controlled release schedule</li>
+                        <li><i class="fas fa-fire" style="color: var(--bubble-micro);"></i> Dogecoin: Inflationary, unlimited supply</li>
+                    </ul>
+                </div>
+                
+                <div class="insight-card">
+                    <div class="insight-header">
+                        <i class="fas fa-chart-line insight-icon" style="color: var(--supply-high);"></i>
+                        <h3>Inflation Impact</h3>
+                    </div>
+                    <ul class="insight-list">
+                        <li><i class="fas fa-arrow-down" style="color: var(--bubble-large);"></i> Low inflation: Preserves purchasing power</li>
+                        <li><i class="fas fa-balance-scale" style="color: var(--bubble-medium);"></i> Moderate inflation: Funds development</li>
+                        <li><i class="fas fa-arrow-up" style="color: var(--bubble-small);"></i> High inflation: Dilutes value over time</li>
+                        <li><i class="fas fa-burn" style="color: var(--bubble-micro);"></i> Burn mechanisms: Can create deflation</li>
+                    </ul>
+                </div>
+                
+                <div class="insight-card">
+                    <div class="insight-header">
+                        <i class="fas fa-shield-alt insight-icon" style="color: var(--supply-low);"></i>
+                        <h3>Supply Security</h3>
+                    </div>
+                    <ul class="insight-list">
+                        <li><i class="fas fa-lock" style="color: var(--bubble-large);"></i> Fixed supply: Predictable, secure against dilution</li>
+                        <li><i class="fas fa-cogs" style="color: var(--bubble-medium);"></i> Governance control: Community decides inflation</li>
+                        <li><i class="fas fa-exclamation-triangle" style="color: var(--bubble-small);"></i> Centralized control: Risk of arbitrary changes</li>
+                        <li><i class="fas fa-code-branch" style="color: var(--bubble-micro);"></i> Algorithmic control: Predictable but inflexible</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <!-- Tokenomics Analysis -->
+            <div class="tokenomics-section">
+                <h3 style="color: #e2e8f0; margin-bottom: 1.5rem;"><i class="fas fa-chess-knight"></i> Tokenomics Strategy Analysis</h3>
+                <div class="tokenomics-grid">
+                    <div class="tokenomics-card">
+                        <div class="tokenomics-icon">
+                            <i class="fas fa-gem"></i>
+                        </div>
+                        <h3 class="tokenomics-title">Scarcity Model</h3>
+                        <p class="tokenomics-description">
+                            Fixed or decreasing supply creates digital scarcity. This model appeals to investors seeking store-of-value assets and protection against inflation. Supply reduction over time increases scarcity and can drive price appreciation.
+                        </p>
+                        <span class="tokenomics-example">Example: Bitcoin, Litecoin</span>
+                    </div>
+                    
+                    <div class="tokenomics-card">
+                        <div class="tokenomics-icon">
+                            <i class="fas fa-balance-scale"></i>
+                        </div>
+                        <h3 class="tokenomics-title">Utility Model</h3>
+                        <p class="tokenomics-description">
+                            Supply expands to meet network growth and usage demands. Inflation funds development, security, and ecosystem growth. This model prioritizes network utility and adoption over pure scarcity.
+                        </p>
+                        <span class="tokenomics-example">Example: Ethereum, Cardano</span>
+                    </div>
+                    
+                    <div class="tokenomics-card">
+                        <div class="tokenomics-icon">
+                            <i class="fas fa-fire"></i>
+                        </div>
+                        <h3 class="tokenomics-title">Inflationary Model</h3>
+                        <p class="tokenomics-description">
+                            High or unlimited supply expansion prioritizes accessibility and transaction volume. This model often targets use as medium of exchange rather than store of value, with lower per-unit costs.
+                        </p>
+                        <span class="tokenomics-example">Example: Dogecoin, XRP</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Supply Health Assessment -->
+            <div class="health-section">
+                <h3 style="color: #e2e8f0; margin-bottom: 1rem;"><i class="fas fa-heartbeat"></i> Supply Structure Health Assessment</h3>
+                <p style="color: #cbd5e1; line-height: 1.7;">
+                    The cryptocurrency market exhibits <strong>diverse supply structures</strong> with varying implications for long-term value. Bitcoin's fixed supply creates predictable scarcity, while Ethereum's controlled inflation balances scarcity with network funding needs. High-inflation assets risk value dilution but can facilitate transaction volume. A healthy tokenomics model typically balances scarcity with utility, provides predictable supply dynamics, and aligns incentives between investors, users, and developers.
+                </p>
+                <div style="display: flex; align-items: center; gap: 1rem; margin-top: 1rem;">
+                    <div style="flex: 1; height: 8px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;">
+                        <div style="width: 72%; height: 100%; background: linear-gradient(90deg, var(--bubble-micro), var(--supply-high)); border-radius: 4px;"></div>
+                    </div>
+                    <span style="color: var(--supply-high); font-weight: 600; font-size: 1.1rem;">72% Healthy</span>
+                </div>
+                <div style="margin-top: 1rem; color: #94a3b8; font-size: 0.9rem;">
+                    <p><i class="fas fa-lightbulb"></i> <strong>Investment Insight:</strong> Consider the balance between scarcity (store of value) and utility (medium of exchange) when evaluating cryptocurrency investments. Fixed-supply assets may appreciate more during adoption phases, while utility-focused tokens may provide value through network participation.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <p class="copyright">© 2025 Crypto Market Visualizations. Supply Dynamics Dashboard</p>
+            <div class="footer-links">
+                <a href="#"><i class="fas fa-database"></i> Supply Data</a>
+                <a href="#"><i class="fas fa-bullseye"></i> Bubble Chart Guide</a>
+                <a href="index.html"><i class="fas fa-home"></i> Dashboard</a>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>

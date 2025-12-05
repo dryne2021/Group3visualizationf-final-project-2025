@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Market Visualizations | Data Analytics Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== CSS Variables ===== */
+        :root {
+            --primary-color: #3a6ff8;
+            --secondary-color: #2ecc71;
+            --dark-color: #0f172a;
+            --light-color: #f8fafc;
+            --card-bg: rgba(30, 41, 59, 0.85);
+            --header-bg: rgba(15, 23, 42, 0.9);
+            --hover-color: #2563eb;
+            --shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            --radius: 12px;
+            --transition: all 0.3s ease;
+            --dashboard-color: #8b5cf6; /* Purple for dashboard */
+        }
+
+        /* ===== Reset & Base Styles ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--light-color);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Background overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('images/crypto-background.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.15;
+            z-index: -1;
+        }
+
+        /* ===== Header Section ===== */
+        .main-header {
+            background: var(--header-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2.5rem 2rem;
+            text-align: center;
+            margin-bottom: 3rem;
+            max-width: 1200px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        }
+
+        .main-header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.8rem;
+            letter-spacing: -0.5px;
+        }
+
+        .main-header .subtitle {
+            font-size: 1.2rem;
+            color: #cbd5e1;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        /* ===== Dashboard Button ===== */
+        .dashboard-button-container {
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .dashboard-btn {
+            background: linear-gradient(135deg, var(--dashboard-color), #a78bfa);
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .dashboard-btn:hover {
+            background: linear-gradient(135deg, #7c3aed, #8b5cf6);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 12px 25px rgba(139, 92, 246, 0.4);
+        }
+
+        .dashboard-btn i {
+            font-size: 1.3rem;
+        }
+
+        /* ===== Content Container ===== */
+        .content-container {
+            max-width: 1200px;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+        }
+
+        /* ===== Project Overview Section ===== */
+        .overview-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: var(--secondary-color);
+        }
+
+        .overview-text {
+            font-size: 1.1rem;
+            color: #cbd5e1;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+
+        .highlight {
+            color: var(--secondary-color);
+            font-weight: 600;
+        }
+
+        /* ===== Stats Section ===== */
+        .stats-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .stat-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            text-align: center;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            background: rgba(30, 41, 59, 0.9);
+            border-color: var(--primary-color);
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+
+        /* ===== Visualization Grid ===== */
+        .visualizations-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .grid-title {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+            color: #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .grid-title i {
+            color: var(--primary-color);
+        }
+
+        .visualization-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .viz-card {
+            background: rgba(30, 41, 59, 0.7);
+            border-radius: var(--radius);
+            padding: 1.8rem;
+            text-align: center;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 180px;
+        }
+
+        .viz-card:hover {
+            transform: translateY(-8px);
+            background: rgba(30, 41, 59, 0.9);
+            border-color: var(--primary-color);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .viz-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+
+        .viz-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+            color: #f1f5f9;
+        }
+
+        .viz-card p {
+            color: #94a3b8;
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+
+        .viz-btn {
+            background: linear-gradient(90deg, var(--primary-color), #5b8cff);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.8rem;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .viz-btn:hover {
+            background: linear-gradient(90deg, var(--hover-color), #4a7dff);
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4);
+        }
+
+        /* ===== Footer ===== */
+        .main-footer {
+            margin-top: 4rem;
+            background: var(--header-bg);
+            backdrop-filter: blur(10px);
+            border-radius: var(--radius);
+            padding: 1.8rem;
+            text-align: center;
+            max-width: 1200px;
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .footer-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .copyright {
+            font-size: 1rem;
+            color: #94a3b8;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .footer-links a {
+            color: #cbd5e1;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.95rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--secondary-color);
+        }
+
+        /* ===== Responsive Design ===== */
+        @media (max-width: 1024px) {
+            .visualization-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .main-header .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .visualization-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .content-container {
+                gap: 2rem;
+            }
+            
+            .overview-section,
+            .stats-section,
+            .visualizations-section {
+                padding: 2rem;
+            }
+            
+            .dashboard-btn {
+                padding: 0.9rem 2rem;
+                font-size: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 15px;
+            }
+            
+            .main-header {
+                padding: 2rem 1.5rem;
+            }
+            
+            .main-header h1 {
+                font-size: 1.9rem;
+            }
+            
+            .section-title,
+            .grid-title {
+                font-size: 1.5rem;
+            }
+            
+            .overview-text {
+                font-size: 1rem;
+            }
+            
+            .dashboard-btn {
+                padding: 0.8rem 1.5rem;
+                font-size: 0.95rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ===== Animation ===== */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .main-header,
+        .overview-section,
+        .stats-section,
+        .visualizations-section,
+        .main-footer {
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        .viz-card,
+        .stat-card {
+            animation: fadeIn 0.6s ease-out forwards;
+            animation-delay: calc(var(--order) * 0.1s);
+        }
+
+        .dashboard-btn {
+            animation: fadeIn 0.8s ease-out forwards;
+            animation-delay: 0.4s;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="main-header">
+        <h1><i class="fas fa-chart-network"></i> Crypto Market Visualizations</h1>
+        <p class="subtitle">Advanced analytics dashboard providing deep insights into cryptocurrency market trends, trading behaviors, and market dynamics through 10 interactive visualizations.</p>
+        
+        <!-- Dashboard Button -->
+        <div class="dashboard-button-container">
+            <a href="dashboard.html" class="dashboard-btn">
+                <i class="fas fa-tachometer-alt"></i> View Executive Dashboard
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="content-container">
+        <!-- Project Overview Section -->
+        <section class="overview-section">
+            <h2 class="section-title"><i class="fas fa-project-diagram"></i> Project Overview</h2>
+            <p class="overview-text">
+                Welcome to the <span class="highlight">Crypto Market Visualizations Dashboard</span>, a comprehensive platform designed for in-depth analysis of cryptocurrency market dynamics. 
+                Our interactive visualizations provide actionable insights into <span class="highlight">market volume</span>, <span class="highlight">capitalization trends</span>, 
+                <span class="highlight">trading patterns</span>, <span class="highlight">price behaviors</span>, and <span class="highlight">supply dynamics</span>. 
+                This tool is built for traders, analysts, and enthusiasts seeking data-driven understanding of the volatile crypto market landscape.
+            </p>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats-section">
+            <h2 class="section-title"><i class="fas fa-chart-bar"></i> Project Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card" style="--order: 1">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="stat-value">10</div>
+                    <div class="stat-label">Visualizations</div>
+                </div>
+                
+                <div class="stat-card" style="--order: 2">
+                    <div class="stat-icon">
+                        <i class="fas fa-coins"></i>
+                    </div>
+                    <div class="stat-value">200+</div>
+                    <div class="stat-label">Cryptocurrencies</div>
+                </div>
+                
+                <div class="stat-card" style="--order: 3">
+                    <div class="stat-icon">
+                        <i class="fas fa-calendar-alt"></i>
+                    </div>
+                    <div class="stat-value">2013-2018</div>
+                    <div class="stat-label">Time Period</div>
+                </div>
+                
+                <div class="stat-card" style="--order: 4">
+                    <div class="stat-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <div class="stat-value">15K+</div>
+                    <div class="stat-label">Data Points</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Visualizations Grid Section -->
+        <section class="visualizations-section">
+            <h2 class="grid-title"><i class="fas fa-chart-bar"></i> Interactive Visualizations</h2>
+            <div class="visualization-grid">
+                <!-- Original 6 Visualizations -->
+                <!-- Card 1 -->
+                <div class="viz-card" style="--order: 1">
+                    <div class="viz-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <h3>Market Volume Analysis</h3>
+                    <p>Examine trading volume patterns and liquidity across different cryptocurrencies</p>
+                    <a href="Market Volume Analysis.html" class="viz-btn">
+                        <i class="fas fa-external-link-alt"></i> Explore
+                    </a>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="viz-card" style="--order: 2">
+                    <div class="viz-icon">
+                        <i class="fas fa-sitemap"></i>
+                    </div>
+                    <h3>Market Cap Treemap</h3>
+                    <p>Hierarchical view of cryptocurrency market capitalization distribution</p>
+                    <a href="Market Capitalization Treemap.html" class="viz-btn">
+                        <i class="fas fa-external-link-alt"></i> Explore
+                    </a>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="viz-card" style="--order: 3">
+                    <div class="viz-icon">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <h3>Close Ratio Analysis</h3>
+                    <p>Analyze closing price patterns and their significance in market trends</p>
+                    <a href="Cryptocurrency Close Ratio Analysis.html" class="viz-btn">
+                        <i class="fas fa-external-link-alt"></i> Explore
+                    </a>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="viz-card" style="--order: 4">
+                    <div class="viz-icon">
+                        <i class="fas fa-calculator"></i>
+                    </div>
+                    <h3>Calculation Overview</h3>
+                    <p>Detailed breakdown of cryptocurrency metrics and calculation methodologies</p>
+                    <a href="Cryptocurrency Calculation Overview.html" class="viz-btn">
+                        <i class="fas fa-external-link-alt"></i> Explore
+                    </a>
+                </div>
+
+                <!-- Card 5 -->
+                <div class="viz-card" style="--order: 5">
+                    <div class="viz-icon">
+                        <i class="fas fa-balance-scale"></i>
+                    </div>
+                    <h3>Market vs Volume</h3>
+                    <p>Comparative analysis between market cap and trading volume relationships</p>
+                    <a href="Market vs Volume Analysis.html" class="viz-btn">
+                        <i class="fas fa-external-link-alt"></i> Explore
+                    </a>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="viz-card" style="--order: 6">
+                    <div class="viz-icon">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <h3>Volume Over Time</h3>
+                    <p>Historical tracking of cryptocurrency volume trends and patterns</p>
+                    <a href="Cryptocurrency Volume Over Time.html" class="viz-btn">
+                        <i class="fas fa-external-link-alt"></i> Explore
+                    </a>
+                </div>
+
+                <!-- New Visualizations (7-10) -->
+                <!-- Card 7: Market Cap Distribution -->
+                <div class="viz-card" style="--order: 7">
+                    <div class="viz-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <h3>Market Cap Distribution</h3>
+                    <p>Pie chart analysis of cryptocurrency market share and concentration</p>
+                    <a href="Market Cap Distribution.html" class="viz-btn">
+                        <i class="fas fa-external-link-alt"></i> Explore
+                    </a>
+                </div>
+
+                <!-- Card 8: High-Low Price Chart -->
+                <div class="viz-card" style="--order: 8">
+                    <div class="viz-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>High-Low Price Analysis</h3>
+                    <p>Visualization of daily price ranges and volatility patterns</p>
+                    <a href="High–Low Chart.html" class="viz-btn">
+                        <i class="fas fa-external-link-alt"></i> Explore
+                    </a>
+                </div>
+
+                <!-- Card 9: Bubble Chart -->
+                <div class="viz-card" style="--order: 9">
+                    <div class="viz-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h3>Supply Bubble Chart</h3>
+                    <p>Bubble chart analysis of cryptocurrency circulating supply</p>
+                    <a href="Bubble Chart for Circulating Supply.html" class="viz-btn">
+                        <i class="fas fa-external-link-alt"></i> Explore
+                    </a>
+                </div>
+
+                <!-- Card 10: Multi-Series Line Chart -->
+                <div class="viz-card" style="--order: 10">
+                    <div class="viz-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>Multi-Series Price Chart</h3>
+                    <p>Comparative analysis of multiple cryptocurrency price movements</p>
+                    <a href="Multi-Series Line Chart for Tracking Crypto Price.html" class="viz-btn">
+                        <i class="fas fa-external-link-alt"></i> Explore
+                    </a>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <p class="copyright">© 2025 Crypto Market Visualizations. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="#"><i class="fas fa-shield-alt"></i> Data Privacy</a>
+                <a href="#"><i class="fas fa-file-contract"></i> Terms of Service</a>
+                <a href="#"><i class="fas fa-envelope"></i> Contact</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Add smooth scrolling animation
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                if (targetId === '#') return;
+                
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - 100,
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // Update stats on page load for visual effect
+        document.addEventListener('DOMContentLoaded', function() {
+            const statCards = document.querySelectorAll('.stat-card');
+            statCards.forEach((card, index) => {
+                card.style.animationDelay = `${(index + 1) * 0.2}s`;
+            });
+        });
+    </script>
+</body>
+</html>
